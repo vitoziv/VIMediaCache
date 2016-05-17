@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10117" systemVersion="15E65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="EfO-db-3YO">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="1xZ-i6-N1V">
+            <objects>
+                <viewController id="EfO-db-3YO" customClass="ViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="zkD-BA-2ra"/>
+                        <viewControllerLayoutGuide type="bottom" id="iJb-1M-zMl"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="WD1-aN-dww">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="U2l-bI-vhJ" customClass="PlayerView">
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                                <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                            </view>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="00" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YIi-pp-uLf">
+                                <rect key="frame" x="20" y="554" width="17" height="16"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="00" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bbi-NS-p8Q">
+                                <rect key="frame" x="563" y="554" width="17" height="16"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="Hnz-ft-KOF">
+                                <rect key="frame" x="18" y="570" width="564" height="31"/>
+                                <connections>
+                                    <action selector="sliderAction:" destination="EfO-db-3YO" eventType="touchUpInside" id="fEj-M7-r8m"/>
+                                    <action selector="touchSliderAction:" destination="EfO-db-3YO" eventType="touchDown" id="nkJ-oM-K4t"/>
+                                </connections>
+                            </slider>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="iJb-1M-zMl" firstAttribute="top" secondItem="Hnz-ft-KOF" secondAttribute="bottom" id="2EP-hd-bYW"/>
+                            <constraint firstItem="Hnz-ft-KOF" firstAttribute="leading" secondItem="WD1-aN-dww" secondAttribute="leading" constant="20" id="5vq-Ib-cOe"/>
+                            <constraint firstItem="Hnz-ft-KOF" firstAttribute="leading" secondItem="YIi-pp-uLf" secondAttribute="leading" id="Bhc-W9-DPb"/>
+                            <constraint firstItem="U2l-bI-vhJ" firstAttribute="leading" secondItem="WD1-aN-dww" secondAttribute="leading" id="NFG-qS-Xp6"/>
+                            <constraint firstAttribute="trailing" secondItem="Hnz-ft-KOF" secondAttribute="trailing" constant="20" id="PbO-FL-oPX"/>
+                            <constraint firstAttribute="trailing" secondItem="U2l-bI-vhJ" secondAttribute="trailing" id="TW2-Ck-FS4"/>
+                            <constraint firstItem="U2l-bI-vhJ" firstAttribute="top" secondItem="WD1-aN-dww" secondAttribute="top" id="Xh7-iZ-A4o"/>
+                            <constraint firstItem="Hnz-ft-KOF" firstAttribute="top" secondItem="YIi-pp-uLf" secondAttribute="bottom" id="Zen-Ji-Lfh"/>
+                            <constraint firstItem="iJb-1M-zMl" firstAttribute="top" secondItem="U2l-bI-vhJ" secondAttribute="bottom" id="ekK-Lg-a7m"/>
+                            <constraint firstItem="Hnz-ft-KOF" firstAttribute="top" secondItem="bbi-NS-p8Q" secondAttribute="bottom" id="emf-ph-rqm"/>
+                            <constraint firstItem="Hnz-ft-KOF" firstAttribute="trailing" secondItem="bbi-NS-p8Q" secondAttribute="trailing" id="zDX-pB-CJ3"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="currentTimeLabel" destination="YIi-pp-uLf" id="LUh-yw-3oO"/>
+                        <outlet property="playerView" destination="U2l-bI-vhJ" id="Ga8-S6-hyQ"/>
+                        <outlet property="slider" destination="Hnz-ft-KOF" id="eXK-TL-QHI"/>
+                        <outlet property="totalTimeLabel" destination="bbi-NS-p8Q" id="ImM-6r-teU"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="fTe-1X-K8x" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="282" y="381"/>
+        </scene>
+    </scenes>
+</document>
