@@ -30,7 +30,7 @@
     self = [super init];
     if (self) {
         NSOperationQueue *queue = [[NSOperationQueue alloc] init];
-        queue.name = @"com.MTMediaCache.download";
+        queue.name = @"com.VIMediaCache.download";
         _downloadQueue = queue;
     }
     return self;

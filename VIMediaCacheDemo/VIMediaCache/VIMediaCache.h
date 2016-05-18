@@ -6,10 +6,10 @@
 //  Copyright © 2016 Vito. All rights reserved.
 //
 
-#ifndef MTMediaCache_h
-#define MTMediaCache_h
+#ifndef VIMediaCache_h
+#define VIMediaCache_h
 
 #import "VIResourceLoaderManager.h"
 #import "VICacheManager.h"
 
-#endif /* MTMediaCache_h */
+#endif /* VIMediaCache_h */

@@ -12,7 +12,7 @@ VIMediaCache use AVAssetResourceLoader to control AVPlayer download media data, 
 
     NSURL *url = [NSURL URLWithString:@"https://mvvideo5.meitudata.com/571090934cea5517.mp4"];
     
-    MTMCResourceLoaderManager *resourceLoaderManager = [MTMCResourceLoaderManager new];
+    VIResourceLoaderManager *resourceLoaderManager = [VIResourceLoaderManager new];
     self.resourceLoaderManager = resourceLoaderManager;
     
     AVPlayerItem *playerItem = [resourceLoaderManager playerItemWithURL:url];
