@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
     s.source = { :git => 'https://github.com/vitoziv/VIMediaCache.git' }
     s.platform = :ios, '7.0'
     s.source_files = 'VIMediaCache/*.{h,m}', 'VIMediaCache/**/*.{h,m}'
-    s.frameworks = 'MobileCoreService', 'AVFoundation'
+    s.frameworks = 'MobileCoreServices', 'AVFoundation'
     s.requires_arc = true
 end
 
