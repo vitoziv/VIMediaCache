@@ -96,8 +96,8 @@ static NSString *kResponseKey = @"kResponseKey";
             if (indexSet.count > 1) {
                 NSRange firstRange = self.internalCacheFragments[indexSet.firstIndex].rangeValue;
                 NSRange lastRange = self.internalCacheFragments[indexSet.lastIndex].rangeValue;
-                long long location = MIN(firstRange.location, fragment.location);
-                long long endOffset = MAX(lastRange.location + lastRange.length, fragment.location + fragment.length);
+                NSInteger location = MIN(firstRange.location, fragment.location);
+                NSInteger endOffset = MAX(lastRange.location + lastRange.length, fragment.location + fragment.length);
                 NSRange combineRange = NSMakeRange(location, endOffset - location);
                 [internalCacheFragments removeObjectsAtIndexes:indexSet];
                 [internalCacheFragments insertObject:[NSValue valueWithRange:combineRange] atIndex:indexSet.firstIndex];
@@ -108,8 +108,8 @@ static NSString *kResponseKey = @"kResponseKey";
                 NSRange expandFragmentRange = NSMakeRange(fragment.location, fragment.length + 1);
                 NSRange intersectionRange = NSIntersectionRange(expandFirstRange, expandFragmentRange);
                 if (intersectionRange.length > 0) { // Should combine
-                    long long location = MIN(firstRange.location, fragment.location);
-                    long long endOffset = MAX(firstRange.location + firstRange.length, fragment.location + fragment.length);
+                    NSInteger location = MIN(firstRange.location, fragment.location);
+                    NSInteger endOffset = MAX(firstRange.location + firstRange.length, fragment.location + fragment.length);
                     NSRange combineRange = NSMakeRange(location, endOffset - location);
                     [internalCacheFragments removeObjectAtIndex:indexSet.firstIndex];
                     [internalCacheFragments insertObject:[NSValue valueWithRange:combineRange] atIndex:indexSet.firstIndex];

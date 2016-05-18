@@ -137,7 +137,7 @@ static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
     if (range.location == NSNotFound) {
         return [actions copy];
     }
-    long long endOffset = range.location + range.length;
+    NSInteger endOffset = range.location + range.length;
     // Delete header and footer not in range
     [cachedFragments enumerateObjectsUsingBlock:^(NSValue * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         NSRange fragmentRange = obj.rangeValue;
@@ -182,7 +182,7 @@ static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
                 [localRemoteActions addObject:obj];
             } else {
                 VICacheAction *lastAction = [localRemoteActions lastObject];
-                long long lastOffset = lastAction.range.location + lastAction.range.length;
+                NSInteger lastOffset = lastAction.range.location + lastAction.range.length;
                 if (actionRange.location > lastOffset) {
                     VICacheAction *action = [VICacheAction new];
                     action.actionType = VICacheAtionTypeRemote;
@@ -193,7 +193,7 @@ static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
             }
             
             if (idx == actions.count - 1) {
-                long long localEndOffset = actionRange.location + actionRange.length;
+                NSInteger localEndOffset = actionRange.location + actionRange.length;
                 if (endOffset > localEndOffset) {
                     VICacheAction *action = [VICacheAction new];
                     action.actionType = VICacheAtionTypeRemote;

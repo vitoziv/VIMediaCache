@@ -17,7 +17,7 @@
 @property (nonatomic, strong) VIMediaCacheWorker *cacheWorker;
 @property (nonatomic, strong) NSMutableArray<VICacheAction *> *restActions;
 
-@property (nonatomic) long long startOffset;
+@property (nonatomic) NSInteger startOffset;
 
 
 @end

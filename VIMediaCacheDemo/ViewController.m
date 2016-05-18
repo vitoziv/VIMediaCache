@@ -46,7 +46,7 @@
 - (IBAction)sliderAction:(UISlider *)sender {
     CMTime duration = self.player.currentItem.asset.duration;
     CMTime seekTo = CMTimeMake((NSInteger)(duration.value * sender.value), duration.timescale);
-    NSLog(@"seetTo %ld", (NSInteger)(duration.value * sender.value) / duration.timescale);
+    NSLog(@"seetTo %ld", (long)(duration.value * sender.value) / duration.timescale);
     __weak typeof(self)weakSelf = self;
     [self.player pause];
     [self.player seekToTime:seekTo completionHandler:^(BOOL finished) {
@@ -139,7 +139,7 @@
         cachedLength += obj.rangeValue.length;
     }];
     
-    NSLog(@"url: %@, progress: %@", url.absoluteString, @((double)cachedLength / (double)contentLength));
+    NSLog(@"url: %@, progress: %@", url, @((double)cachedLength / (double)contentLength));
 }
 
 @end

@@ -20,7 +20,7 @@
 
 - (NSURLSessionDataTask *)downloadTaskWithDelegate:(id<MediaDownloaderDelegate>)delegate
                                         fromOffset:(unsigned long long)fromOffset
-                                            length:(unsigned long long)length;
+                                            length:(NSInteger)length;
 - (void)cancelTask:(NSURLSessionTask *)task;
 - (void)cancelAllTasks;
 

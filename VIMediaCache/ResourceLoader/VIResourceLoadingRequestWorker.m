@@ -27,8 +27,8 @@
         _mediaDownloader = mediaDownloader;
         _request = request;
         AVAssetResourceLoadingDataRequest *dataRequest = request.dataRequest;
-        unsigned long long offset = dataRequest.currentOffset;
-        unsigned long long length = dataRequest.requestedLength;
+        long long offset = dataRequest.currentOffset;
+        NSInteger length = dataRequest.requestedLength;
         _task = [self.mediaDownloader downloadTaskWithDelegate:self fromOffset:offset length:length];
     }
     return self;

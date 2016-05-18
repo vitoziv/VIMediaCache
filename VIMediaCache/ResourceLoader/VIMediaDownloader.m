@@ -68,7 +68,7 @@
 
 - (NSURLSessionDataTask *)downloadTaskWithDelegate:(id<MediaDownloaderDelegate>)delegate
                                         fromOffset:(unsigned long long)fromOffset
-                                            length:(unsigned long long)length {
+                                            length:(NSInteger)length {
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:self.url];
     NSString *range = [NSString stringWithFormat:@"Bytes=%lld-%lld", fromOffset, fromOffset + length - 1];
     [request setValue:range forHTTPHeaderField:@"Range"];
