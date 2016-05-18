@@ -5,7 +5,7 @@ Pod::Spec.new do |s|
     s.summary = 'VIMediaCache is a tool to cache media file while play media using AVPlayer'
     s.homepage = 'https://github.com/vitoziv/VIMediaCache'
     s.author = { 'Vito' => 'vvitozhang@gmail.com' }
-    s.source = { :git => 'https://github.com/vitoziv/VIMediaCache.git' }
+    s.source = { :git => 'https://github.com/vitoziv/VIMediaCache.git', :tag => s.version.to_s }
     s.platform = :ios, '7.0'
     s.source_files = 'VIMediaCache/*.{h,m}', 'VIMediaCache/**/*.{h,m}'
     s.frameworks = 'MobileCoreServices', 'AVFoundation'
