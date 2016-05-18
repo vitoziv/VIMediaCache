@@ -14,18 +14,18 @@
 		5F5FA61B1CEA2BE2004439D3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5F5FA61A1CEA2BE2004439D3 /* Assets.xcassets */; };
 		5F5FA61E1CEA2BE2004439D3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5F5FA61C1CEA2BE2004439D3 /* LaunchScreen.storyboard */; };
 		5F5FA6291CEA2BE2004439D3 /* VIMediaCacheDemoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5F5FA6281CEA2BE2004439D3 /* VIMediaCacheDemoTests.m */; };
-		5F5FA6721CEA2D43004439D3 /* VIContentInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 5F5FA65B1CEA2D43004439D3 /* VIContentInfo.m */; };
-		5F5FA6731CEA2D43004439D3 /* VIMediaDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 5F5FA65D1CEA2D43004439D3 /* VIMediaDownloader.m */; };
-		5F5FA6741CEA2D43004439D3 /* VIResourceLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = 5F5FA65F1CEA2D43004439D3 /* VIResourceLoader.m */; };
-		5F5FA6751CEA2D43004439D3 /* VIResourceLoaderManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5F5FA6611CEA2D43004439D3 /* VIResourceLoaderManager.m */; };
-		5F5FA6761CEA2D43004439D3 /* VIResourceLoadingRequestWorker.m in Sources */ = {isa = PBXBuildFile; fileRef = 5F5FA6631CEA2D43004439D3 /* VIResourceLoadingRequestWorker.m */; };
-		5F5FA6771CEA2D43004439D3 /* VICacheAction.m in Sources */ = {isa = PBXBuildFile; fileRef = 5F5FA6661CEA2D43004439D3 /* VICacheAction.m */; };
-		5F5FA6781CEA2D43004439D3 /* VICacheConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 5F5FA6681CEA2D43004439D3 /* VICacheConfiguration.m */; };
-		5F5FA6791CEA2D43004439D3 /* VICacheManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5F5FA66A1CEA2D43004439D3 /* VICacheManager.m */; };
-		5F5FA67A1CEA2D43004439D3 /* VICacheSessionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5F5FA66C1CEA2D43004439D3 /* VICacheSessionManager.m */; };
-		5F5FA67B1CEA2D43004439D3 /* VIMediaCacheWorker.m in Sources */ = {isa = PBXBuildFile; fileRef = 5F5FA66E1CEA2D43004439D3 /* VIMediaCacheWorker.m */; };
-		5F5FA67C1CEA2D43004439D3 /* VIURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 5F5FA6701CEA2D43004439D3 /* VIURLProtocol.m */; };
 		5F5FA67F1CEA2D95004439D3 /* PlayerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5F5FA67E1CEA2D95004439D3 /* PlayerView.m */; };
+		5FDCF2AE1CEBF26800188E0C /* VIContentInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FDCF2971CEBF26800188E0C /* VIContentInfo.m */; };
+		5FDCF2AF1CEBF26800188E0C /* VIMediaDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FDCF2991CEBF26800188E0C /* VIMediaDownloader.m */; };
+		5FDCF2B01CEBF26800188E0C /* VIResourceLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FDCF29B1CEBF26800188E0C /* VIResourceLoader.m */; };
+		5FDCF2B11CEBF26800188E0C /* VIResourceLoaderManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FDCF29D1CEBF26800188E0C /* VIResourceLoaderManager.m */; };
+		5FDCF2B21CEBF26800188E0C /* VIResourceLoadingRequestWorker.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FDCF29F1CEBF26800188E0C /* VIResourceLoadingRequestWorker.m */; };
+		5FDCF2B31CEBF26800188E0C /* VICacheAction.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FDCF2A21CEBF26800188E0C /* VICacheAction.m */; };
+		5FDCF2B41CEBF26800188E0C /* VICacheConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FDCF2A41CEBF26800188E0C /* VICacheConfiguration.m */; };
+		5FDCF2B51CEBF26800188E0C /* VICacheManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FDCF2A61CEBF26800188E0C /* VICacheManager.m */; };
+		5FDCF2B61CEBF26800188E0C /* VICacheSessionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FDCF2A81CEBF26800188E0C /* VICacheSessionManager.m */; };
+		5FDCF2B71CEBF26800188E0C /* VIMediaCacheWorker.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FDCF2AA1CEBF26800188E0C /* VIMediaCacheWorker.m */; };
+		5FDCF2B81CEBF26800188E0C /* VIURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FDCF2AC1CEBF26800188E0C /* VIURLProtocol.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -52,31 +52,31 @@
 		5F5FA6241CEA2BE2004439D3 /* VIMediaCacheDemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VIMediaCacheDemoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5F5FA6281CEA2BE2004439D3 /* VIMediaCacheDemoTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VIMediaCacheDemoTests.m; sourceTree = "<group>"; };
 		5F5FA62A1CEA2BE2004439D3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		5F5FA65A1CEA2D43004439D3 /* VIContentInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VIContentInfo.h; sourceTree = "<group>"; };
-		5F5FA65B1CEA2D43004439D3 /* VIContentInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VIContentInfo.m; sourceTree = "<group>"; };
-		5F5FA65C1CEA2D43004439D3 /* VIMediaDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VIMediaDownloader.h; sourceTree = "<group>"; };
-		5F5FA65D1CEA2D43004439D3 /* VIMediaDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VIMediaDownloader.m; sourceTree = "<group>"; };
-		5F5FA65E1CEA2D43004439D3 /* VIResourceLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VIResourceLoader.h; sourceTree = "<group>"; };
-		5F5FA65F1CEA2D43004439D3 /* VIResourceLoader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VIResourceLoader.m; sourceTree = "<group>"; };
-		5F5FA6601CEA2D43004439D3 /* VIResourceLoaderManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VIResourceLoaderManager.h; sourceTree = "<group>"; };
-		5F5FA6611CEA2D43004439D3 /* VIResourceLoaderManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VIResourceLoaderManager.m; sourceTree = "<group>"; };
-		5F5FA6621CEA2D43004439D3 /* VIResourceLoadingRequestWorker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VIResourceLoadingRequestWorker.h; sourceTree = "<group>"; };
-		5F5FA6631CEA2D43004439D3 /* VIResourceLoadingRequestWorker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VIResourceLoadingRequestWorker.m; sourceTree = "<group>"; };
-		5F5FA6651CEA2D43004439D3 /* VICacheAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VICacheAction.h; sourceTree = "<group>"; };
-		5F5FA6661CEA2D43004439D3 /* VICacheAction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VICacheAction.m; sourceTree = "<group>"; };
-		5F5FA6671CEA2D43004439D3 /* VICacheConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VICacheConfiguration.h; sourceTree = "<group>"; };
-		5F5FA6681CEA2D43004439D3 /* VICacheConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VICacheConfiguration.m; sourceTree = "<group>"; };
-		5F5FA6691CEA2D43004439D3 /* VICacheManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VICacheManager.h; sourceTree = "<group>"; };
-		5F5FA66A1CEA2D43004439D3 /* VICacheManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VICacheManager.m; sourceTree = "<group>"; };
-		5F5FA66B1CEA2D43004439D3 /* VICacheSessionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VICacheSessionManager.h; sourceTree = "<group>"; };
-		5F5FA66C1CEA2D43004439D3 /* VICacheSessionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VICacheSessionManager.m; sourceTree = "<group>"; };
-		5F5FA66D1CEA2D43004439D3 /* VIMediaCacheWorker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VIMediaCacheWorker.h; sourceTree = "<group>"; };
-		5F5FA66E1CEA2D43004439D3 /* VIMediaCacheWorker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VIMediaCacheWorker.m; sourceTree = "<group>"; };
-		5F5FA66F1CEA2D43004439D3 /* VIURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VIURLProtocol.h; sourceTree = "<group>"; };
-		5F5FA6701CEA2D43004439D3 /* VIURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VIURLProtocol.m; sourceTree = "<group>"; };
-		5F5FA6711CEA2D43004439D3 /* VIMediaCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VIMediaCache.h; sourceTree = "<group>"; };
 		5F5FA67D1CEA2D95004439D3 /* PlayerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlayerView.h; sourceTree = "<group>"; };
 		5F5FA67E1CEA2D95004439D3 /* PlayerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlayerView.m; sourceTree = "<group>"; };
+		5FDCF2961CEBF26800188E0C /* VIContentInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VIContentInfo.h; sourceTree = "<group>"; };
+		5FDCF2971CEBF26800188E0C /* VIContentInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VIContentInfo.m; sourceTree = "<group>"; };
+		5FDCF2981CEBF26800188E0C /* VIMediaDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VIMediaDownloader.h; sourceTree = "<group>"; };
+		5FDCF2991CEBF26800188E0C /* VIMediaDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VIMediaDownloader.m; sourceTree = "<group>"; };
+		5FDCF29A1CEBF26800188E0C /* VIResourceLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VIResourceLoader.h; sourceTree = "<group>"; };
+		5FDCF29B1CEBF26800188E0C /* VIResourceLoader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VIResourceLoader.m; sourceTree = "<group>"; };
+		5FDCF29C1CEBF26800188E0C /* VIResourceLoaderManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VIResourceLoaderManager.h; sourceTree = "<group>"; };
+		5FDCF29D1CEBF26800188E0C /* VIResourceLoaderManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VIResourceLoaderManager.m; sourceTree = "<group>"; };
+		5FDCF29E1CEBF26800188E0C /* VIResourceLoadingRequestWorker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VIResourceLoadingRequestWorker.h; sourceTree = "<group>"; };
+		5FDCF29F1CEBF26800188E0C /* VIResourceLoadingRequestWorker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VIResourceLoadingRequestWorker.m; sourceTree = "<group>"; };
+		5FDCF2A11CEBF26800188E0C /* VICacheAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VICacheAction.h; sourceTree = "<group>"; };
+		5FDCF2A21CEBF26800188E0C /* VICacheAction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VICacheAction.m; sourceTree = "<group>"; };
+		5FDCF2A31CEBF26800188E0C /* VICacheConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VICacheConfiguration.h; sourceTree = "<group>"; };
+		5FDCF2A41CEBF26800188E0C /* VICacheConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VICacheConfiguration.m; sourceTree = "<group>"; };
+		5FDCF2A51CEBF26800188E0C /* VICacheManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VICacheManager.h; sourceTree = "<group>"; };
+		5FDCF2A61CEBF26800188E0C /* VICacheManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VICacheManager.m; sourceTree = "<group>"; };
+		5FDCF2A71CEBF26800188E0C /* VICacheSessionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VICacheSessionManager.h; sourceTree = "<group>"; };
+		5FDCF2A81CEBF26800188E0C /* VICacheSessionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VICacheSessionManager.m; sourceTree = "<group>"; };
+		5FDCF2A91CEBF26800188E0C /* VIMediaCacheWorker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VIMediaCacheWorker.h; sourceTree = "<group>"; };
+		5FDCF2AA1CEBF26800188E0C /* VIMediaCacheWorker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VIMediaCacheWorker.m; sourceTree = "<group>"; };
+		5FDCF2AB1CEBF26800188E0C /* VIURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VIURLProtocol.h; sourceTree = "<group>"; };
+		5FDCF2AC1CEBF26800188E0C /* VIURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VIURLProtocol.m; sourceTree = "<group>"; };
+		5FDCF2AD1CEBF26800188E0C /* VIMediaCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VIMediaCache.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,7 +118,7 @@
 		5F5FA60D1CEA2BE2004439D3 /* VIMediaCacheDemo */ = {
 			isa = PBXGroup;
 			children = (
-				5F5FA6581CEA2D43004439D3 /* VIMediaCache */,
+				5FDCF2941CEBF26800188E0C /* VIMediaCache */,
 				5F5FA6111CEA2BE2004439D3 /* AppDelegate.h */,
 				5F5FA6121CEA2BE2004439D3 /* AppDelegate.m */,
 				5F5FA6141CEA2BE2004439D3 /* ViewController.h */,
@@ -151,48 +151,48 @@
 			path = VIMediaCacheDemoTests;
 			sourceTree = "<group>";
 		};
-		5F5FA6581CEA2D43004439D3 /* VIMediaCache */ = {
+		5FDCF2941CEBF26800188E0C /* VIMediaCache */ = {
 			isa = PBXGroup;
 			children = (
-				5F5FA6591CEA2D43004439D3 /* ResourceLoader */,
-				5F5FA6641CEA2D43004439D3 /* URLProtocol */,
-				5F5FA6711CEA2D43004439D3 /* VIMediaCache.h */,
+				5FDCF2951CEBF26800188E0C /* ResourceLoader */,
+				5FDCF2A01CEBF26800188E0C /* URLProtocol */,
+				5FDCF2AD1CEBF26800188E0C /* VIMediaCache.h */,
 			);
 			path = VIMediaCache;
-			sourceTree = "<group>";
+			sourceTree = SOURCE_ROOT;
 		};
-		5F5FA6591CEA2D43004439D3 /* ResourceLoader */ = {
+		5FDCF2951CEBF26800188E0C /* ResourceLoader */ = {
 			isa = PBXGroup;
 			children = (
-				5F5FA65A1CEA2D43004439D3 /* VIContentInfo.h */,
-				5F5FA65B1CEA2D43004439D3 /* VIContentInfo.m */,
-				5F5FA65C1CEA2D43004439D3 /* VIMediaDownloader.h */,
-				5F5FA65D1CEA2D43004439D3 /* VIMediaDownloader.m */,
-				5F5FA65E1CEA2D43004439D3 /* VIResourceLoader.h */,
-				5F5FA65F1CEA2D43004439D3 /* VIResourceLoader.m */,
-				5F5FA6601CEA2D43004439D3 /* VIResourceLoaderManager.h */,
-				5F5FA6611CEA2D43004439D3 /* VIResourceLoaderManager.m */,
-				5F5FA6621CEA2D43004439D3 /* VIResourceLoadingRequestWorker.h */,
-				5F5FA6631CEA2D43004439D3 /* VIResourceLoadingRequestWorker.m */,
+				5FDCF2961CEBF26800188E0C /* VIContentInfo.h */,
+				5FDCF2971CEBF26800188E0C /* VIContentInfo.m */,
+				5FDCF2981CEBF26800188E0C /* VIMediaDownloader.h */,
+				5FDCF2991CEBF26800188E0C /* VIMediaDownloader.m */,
+				5FDCF29A1CEBF26800188E0C /* VIResourceLoader.h */,
+				5FDCF29B1CEBF26800188E0C /* VIResourceLoader.m */,
+				5FDCF29C1CEBF26800188E0C /* VIResourceLoaderManager.h */,
+				5FDCF29D1CEBF26800188E0C /* VIResourceLoaderManager.m */,
+				5FDCF29E1CEBF26800188E0C /* VIResourceLoadingRequestWorker.h */,
+				5FDCF29F1CEBF26800188E0C /* VIResourceLoadingRequestWorker.m */,
 			);
 			path = ResourceLoader;
 			sourceTree = "<group>";
 		};
-		5F5FA6641CEA2D43004439D3 /* URLProtocol */ = {
+		5FDCF2A01CEBF26800188E0C /* URLProtocol */ = {
 			isa = PBXGroup;
 			children = (
-				5F5FA6651CEA2D43004439D3 /* VICacheAction.h */,
-				5F5FA6661CEA2D43004439D3 /* VICacheAction.m */,
-				5F5FA6671CEA2D43004439D3 /* VICacheConfiguration.h */,
-				5F5FA6681CEA2D43004439D3 /* VICacheConfiguration.m */,
-				5F5FA6691CEA2D43004439D3 /* VICacheManager.h */,
-				5F5FA66A1CEA2D43004439D3 /* VICacheManager.m */,
-				5F5FA66B1CEA2D43004439D3 /* VICacheSessionManager.h */,
-				5F5FA66C1CEA2D43004439D3 /* VICacheSessionManager.m */,
-				5F5FA66D1CEA2D43004439D3 /* VIMediaCacheWorker.h */,
-				5F5FA66E1CEA2D43004439D3 /* VIMediaCacheWorker.m */,
-				5F5FA66F1CEA2D43004439D3 /* VIURLProtocol.h */,
-				5F5FA6701CEA2D43004439D3 /* VIURLProtocol.m */,
+				5FDCF2A11CEBF26800188E0C /* VICacheAction.h */,
+				5FDCF2A21CEBF26800188E0C /* VICacheAction.m */,
+				5FDCF2A31CEBF26800188E0C /* VICacheConfiguration.h */,
+				5FDCF2A41CEBF26800188E0C /* VICacheConfiguration.m */,
+				5FDCF2A51CEBF26800188E0C /* VICacheManager.h */,
+				5FDCF2A61CEBF26800188E0C /* VICacheManager.m */,
+				5FDCF2A71CEBF26800188E0C /* VICacheSessionManager.h */,
+				5FDCF2A81CEBF26800188E0C /* VICacheSessionManager.m */,
+				5FDCF2A91CEBF26800188E0C /* VIMediaCacheWorker.h */,
+				5FDCF2AA1CEBF26800188E0C /* VIMediaCacheWorker.m */,
+				5FDCF2AB1CEBF26800188E0C /* VIURLProtocol.h */,
+				5FDCF2AC1CEBF26800188E0C /* VIURLProtocol.m */,
 			);
 			path = URLProtocol;
 			sourceTree = "<group>";
@@ -297,21 +297,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5F5FA67A1CEA2D43004439D3 /* VICacheSessionManager.m in Sources */,
-				5F5FA6721CEA2D43004439D3 /* VIContentInfo.m in Sources */,
-				5F5FA6741CEA2D43004439D3 /* VIResourceLoader.m in Sources */,
-				5F5FA6791CEA2D43004439D3 /* VICacheManager.m in Sources */,
+				5FDCF2AF1CEBF26800188E0C /* VIMediaDownloader.m in Sources */,
+				5FDCF2B31CEBF26800188E0C /* VICacheAction.m in Sources */,
+				5FDCF2B21CEBF26800188E0C /* VIResourceLoadingRequestWorker.m in Sources */,
 				5F5FA67F1CEA2D95004439D3 /* PlayerView.m in Sources */,
-				5F5FA6781CEA2D43004439D3 /* VICacheConfiguration.m in Sources */,
-				5F5FA6731CEA2D43004439D3 /* VIMediaDownloader.m in Sources */,
-				5F5FA6771CEA2D43004439D3 /* VICacheAction.m in Sources */,
 				5F5FA6161CEA2BE2004439D3 /* ViewController.m in Sources */,
-				5F5FA67C1CEA2D43004439D3 /* VIURLProtocol.m in Sources */,
+				5FDCF2B81CEBF26800188E0C /* VIURLProtocol.m in Sources */,
+				5FDCF2B61CEBF26800188E0C /* VICacheSessionManager.m in Sources */,
 				5F5FA6131CEA2BE2004439D3 /* AppDelegate.m in Sources */,
-				5F5FA6751CEA2D43004439D3 /* VIResourceLoaderManager.m in Sources */,
-				5F5FA6761CEA2D43004439D3 /* VIResourceLoadingRequestWorker.m in Sources */,
-				5F5FA67B1CEA2D43004439D3 /* VIMediaCacheWorker.m in Sources */,
+				5FDCF2B01CEBF26800188E0C /* VIResourceLoader.m in Sources */,
+				5FDCF2B11CEBF26800188E0C /* VIResourceLoaderManager.m in Sources */,
 				5F5FA6101CEA2BE2004439D3 /* main.m in Sources */,
+				5FDCF2B71CEBF26800188E0C /* VIMediaCacheWorker.m in Sources */,
+				5FDCF2B51CEBF26800188E0C /* VICacheManager.m in Sources */,
+				5FDCF2AE1CEBF26800188E0C /* VIContentInfo.m in Sources */,
+				5FDCF2B41CEBF26800188E0C /* VICacheConfiguration.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -500,6 +500,7 @@
 				5F5FA62F1CEA2BE2004439D3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		5F5FA6301CEA2BE2004439D3 /* Build configuration list for PBXNativeTarget "VIMediaCacheDemoTests" */ = {
 			isa = XCConfigurationList;
@@ -508,6 +509,7 @@
 				5F5FA6321CEA2BE2004439D3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
