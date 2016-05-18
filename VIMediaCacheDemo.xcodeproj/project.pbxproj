@@ -26,6 +26,8 @@
 		5FDCF2B61CEBF26800188E0C /* VICacheSessionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FDCF2A81CEBF26800188E0C /* VICacheSessionManager.m */; };
 		5FDCF2B71CEBF26800188E0C /* VIMediaCacheWorker.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FDCF2AA1CEBF26800188E0C /* VIMediaCacheWorker.m */; };
 		5FDCF2B81CEBF26800188E0C /* VIURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FDCF2AC1CEBF26800188E0C /* VIURLProtocol.m */; };
+		5FDCF2BA1CEBF74600188E0C /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5FDCF2B91CEBF74600188E0C /* MobileCoreServices.framework */; };
+		5FDCF2BC1CEBF76200188E0C /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5FDCF2BB1CEBF76200188E0C /* AVFoundation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -77,6 +79,8 @@
 		5FDCF2AB1CEBF26800188E0C /* VIURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VIURLProtocol.h; sourceTree = "<group>"; };
 		5FDCF2AC1CEBF26800188E0C /* VIURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VIURLProtocol.m; sourceTree = "<group>"; };
 		5FDCF2AD1CEBF26800188E0C /* VIMediaCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VIMediaCache.h; sourceTree = "<group>"; };
+		5FDCF2B91CEBF74600188E0C /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
+		5FDCF2BB1CEBF76200188E0C /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,6 +88,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5FDCF2BC1CEBF76200188E0C /* AVFoundation.framework in Frameworks */,
+				5FDCF2BA1CEBF74600188E0C /* MobileCoreServices.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -137,6 +143,8 @@
 		5F5FA60E1CEA2BE2004439D3 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				5FDCF2BB1CEBF76200188E0C /* AVFoundation.framework */,
+				5FDCF2B91CEBF74600188E0C /* MobileCoreServices.framework */,
 				5F5FA60F1CEA2BE2004439D3 /* main.m */,
 			);
 			name = "Supporting Files";
