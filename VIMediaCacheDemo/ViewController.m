@@ -129,17 +129,37 @@
 
 - (void)mediaCacheDidChanged:(NSNotification *)notification {
     NSDictionary *userInfo = notification.userInfo;
-    NSURL *url = userInfo[VICacheURLKey];
     
     NSArray<NSValue *> *cachedFragments = userInfo[VICacheFragmentsKey];
     long long contentLength = [userInfo[VICacheContentLengthKey] longLongValue];
     
-    __block long long cachedLength = 0;
+    NSInteger number = 100;
+    NSMutableString *progressStr = [NSMutableString string];
+    
     [cachedFragments enumerateObjectsUsingBlock:^(NSValue * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        cachedLength += obj.rangeValue.length;
+        NSRange range = obj.rangeValue;
+        
+        NSInteger location = roundf((range.location / (double)contentLength) * number);
+        
+        NSInteger progressCount = progressStr.length;
+        [self string:progressStr appendString:@"0" muti:location - progressCount];
+        
+        NSInteger length = roundf((range.length / (double)contentLength) * number);
+        [self string:progressStr appendString:@"1" muti:length];
+        
+        
+        if (idx == cachedFragments.count - 1 && (location + length) <= number + 1) {
+            [self string:progressStr appendString:@"0" muti:number - (length + location)];
+        }
     }];
     
-    NSLog(@"url: %@, progress: %@", url, @((double)cachedLength / (double)contentLength));
+    NSLog(@"%@", progressStr);
+}
+
+- (void)string:(NSMutableString *)string appendString:(NSString *)appendString muti:(NSInteger)muti {
+    for (NSInteger i = 0; i < muti; i++) {
+        [string appendString:appendString];
+    }
 }
 
 @end
