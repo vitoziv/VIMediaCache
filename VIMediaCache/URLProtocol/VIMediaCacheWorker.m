@@ -120,7 +120,6 @@ static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
     @synchronized(self.readFileHandle) {
         @try {
             [self.readFileHandle seekToFileOffset:range.location];
-            NSLog(@"cache fragments: %@, cachedDataForRange: %@", self.cacheConfiguration.cacheFragments, NSStringFromRange(range));
             NSData *data = [self.readFileHandle readDataOfLength:range.length]; // 空数据也会返回，所以如果 range 错误，会导致播放失效
             return data;
         } @catch (NSException *exception) {
@@ -154,7 +153,6 @@ static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
                 NSInteger length = (offsetLocation + kPackageLength) > maxLocation ? (maxLocation - offsetLocation) : kPackageLength;
                 action.range = NSMakeRange(offsetLocation, length);
                 
-                NSLog(@"index: %@, range: %@", @(i), NSStringFromRange(action.range));
                 [actions addObject:action];
             }
         } else if (fragmentRange.location >= endOffset) {
