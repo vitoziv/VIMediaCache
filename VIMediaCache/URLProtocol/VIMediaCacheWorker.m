@@ -36,7 +36,9 @@ static NSInteger const kPackageLength = 204800; // 200kb per package
     VIMediaCacheWorker *cacheWorker = self.memoryCacheWorkers[cacheName];
     if (!cacheWorker) {
         cacheWorker = [[VIMediaCacheWorker alloc] initWithCacheName:cacheName];
-        self.memoryCacheWorkers[cacheName] = cacheWorker;
+        if (cacheName) {
+            self.memoryCacheWorkers[cacheName] = cacheWorker;
+        }
     }
     
     return cacheWorker;
