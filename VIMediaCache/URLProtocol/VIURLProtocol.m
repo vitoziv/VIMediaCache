@@ -113,7 +113,6 @@ static NSString *const VIURLProtocolHandledKey = @"VIURLProtocolHandledKey";
     VICacheAction *action = [self.restActions firstObject];
     if (!action) {
         [self.client URLProtocolDidFinishLoading:self];
-        NSLog(@"finishLoading has not action");
         [self consumePendingRequestIfNeed];
         return;
     }
@@ -194,7 +193,7 @@ didCompleteWithError:(nullable NSError *)error {
             [self.client URLProtocol:self didFailWithError:error];
             NSLog(@"request error %@, request header %@", error, task.currentRequest.allHTTPHeaderFields);
         } else {
-            NSLog(@"cancel request %@", task.currentRequest.allHTTPHeaderFields);
+            // Cancelled because of stop loading. According to -(void)stopLoading method description, we should stop sending notifications to the client
         }
         
         [self consumePendingRequestIfNeed];
