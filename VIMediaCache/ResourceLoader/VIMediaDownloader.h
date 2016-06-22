@@ -22,7 +22,7 @@
                                         fromOffset:(unsigned long long)fromOffset
                                             length:(NSInteger)length;
 - (void)cancelTask:(NSURLSessionTask *)task;
-- (void)cancelAllTasks;
+- (void)invalidateAndCancel;
 
 @end
 

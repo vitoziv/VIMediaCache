@@ -29,14 +29,20 @@
     if (self) {
         _url = url;
         _taskDelegateDic = [NSMutableDictionary dictionary];
-        
-        NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
-        configuration.protocolClasses = [@[[VIURLProtocol class]] arrayByAddingObjectsFromArray:configuration.protocolClasses];
-        NSOperationQueue *queue = [VICacheSessionManager shared].downloadQueue;
-        NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration delegate:self delegateQueue:queue];
-        self.session = session;
     }
     return self;
+}
+
+- (NSURLSession *)session {
+    if (!_session) {
+        NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+        NSArray *protocolClasses = @[[VIURLProtocol class]];
+        configuration.protocolClasses = [protocolClasses arrayByAddingObjectsFromArray:configuration.protocolClasses];
+        NSOperationQueue *queue = [VICacheSessionManager shared].downloadQueue;
+        NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration delegate:self delegateQueue:queue];
+        _session = session;
+    }
+    return _session;
 }
 
 - (NSURLSessionDataTask *)fetchFileInfoTaskWithCompletion:(void(^)(VIContentInfo *info, NSError *error))completion {
@@ -86,10 +92,9 @@
     [self.taskDelegateDic removeObjectForKey:task];
 }
 
-- (void)cancelAllTasks {
-    [self.session getTasksWithCompletionHandler:^(NSArray<NSURLSessionDataTask *> * _Nonnull dataTasks, NSArray<NSURLSessionUploadTask *> * _Nonnull uploadTasks, NSArray<NSURLSessionDownloadTask *> * _Nonnull downloadTasks) {
-        [dataTasks makeObjectsPerformSelector:@selector(cancel)];
-    }];
+- (void)invalidateAndCancel {
+    [self.session invalidateAndCancel];
+    self.session = nil;
 }
 
 #pragma mark - NSURLSessionDataDelegate

@@ -28,7 +28,7 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
 
 
 - (void)dealloc {
-    [_mediaDownloader cancelAllTasks];
+    [_mediaDownloader invalidateAndCancel];
 }
 
 - (instancetype)initWithURL:(NSURL *)url {
@@ -108,7 +108,7 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
 
 - (void)cancel {
     self.cancelled = YES;
-    [self.mediaDownloader cancelAllTasks];
+    [self.mediaDownloader invalidateAndCancel];
 }
 
 #pragma mark - VIResourceLoadingRequestWorkerDelegate
