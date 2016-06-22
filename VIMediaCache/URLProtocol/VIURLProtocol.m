@@ -11,51 +11,23 @@
 #import "VICacheAction.h"
 #import "VICacheSessionManager.h"
 
+static NSString *const VIURLProtocolHandledKey = @"VIURLProtocolHandledKey";
+
 @interface VIURLProtocol () <NSURLSessionDataDelegate>
 
 @property (nonatomic, strong) NSURLSession *session;
 @property (nonatomic, strong) VIMediaCacheWorker *cacheWorker;
 @property (nonatomic, strong) NSMutableArray<VICacheAction *> *restActions;
 
-@property (nonatomic) NSInteger startOffset;
+@property (nonatomic, strong) NSMutableArray *pendingRequests;
 
+@property (nonatomic) NSInteger startOffset;
 
 @end
 
 @implementation VIURLProtocol
 
-- (void)commonInit {
-    if (!_session) {
-        NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
-        NSOperationQueue *queue = [VICacheSessionManager shared].downloadQueue;
-        _session = [NSURLSession sessionWithConfiguration:configuration delegate:self delegateQueue:queue];
-    }
-    
-    if (!_cacheWorker) {
-        NSString *cacheName = [self.request.URL lastPathComponent];
-        _cacheWorker = [VIMediaCacheWorker inMemoryCacheWorkerWithCacheName:cacheName];
-        NSRange requestRange = [self requestRange];
-        _startOffset = requestRange.location;
-    }
-}
-
 #pragma mark - Override
-
-- (instancetype)initWithTask:(NSURLSessionTask *)task cachedResponse:(NSCachedURLResponse *)cachedResponse client:(id<NSURLProtocolClient>)client {
-    self = [super initWithTask:task cachedResponse:cachedResponse client:client];
-    if (self) {
-        [self commonInit];
-    }
-    return self;
-}
-
-- (instancetype)initWithRequest:(NSURLRequest *)request cachedResponse:(NSCachedURLResponse *)cachedResponse client:(id<NSURLProtocolClient>)client {
-    self = [super initWithRequest:request cachedResponse:cachedResponse client:client];
-    if (self) {
-        [self commonInit];
-    }
-    return self;
-}
 
 + (NSURLRequest *)canonicalRequestForRequest:(NSURLRequest *)request {
     return request;
@@ -66,57 +38,83 @@
 }
 
 + (BOOL)canInitWithTask:(NSURLSessionTask *)task {
-    if ([task.currentRequest.HTTPMethod isEqualToString:@"GET"] || [task.currentRequest.HTTPMethod isEqualToString:@"HEAD"]) {
-        return YES;
+    // Should not load task, if the same task has already loaded.
+    if ([NSURLProtocol propertyForKey:VIURLProtocolHandledKey inRequest:task.originalRequest]) {
+        return NO;
     }
     
-    return NO;
+    return YES;
 }
 
 + (BOOL)canInitWithRequest:(NSURLRequest *)request {
-    if ([request.HTTPMethod isEqualToString:@"GET"] || [request.HTTPMethod isEqualToString:@"HEAD"]) {
-        return YES;
+    // Should not load request, if the same request has already loaded.
+    if ([NSURLProtocol propertyForKey:VIURLProtocolHandledKey inRequest:request]) {
+        return NO;
     }
     
-    return NO;
+    return YES;
 }
 
 - (void)startLoading {
-    if ([self.request.HTTPMethod isEqualToString:@"HEAD"]) {
-        NSURLResponse *response = [self.cacheWorker cachedResponse];
-        if (!response) {
-            [[self.session dataTaskWithRequest:self.request] resume];
-        } else {
-            [self.client URLProtocol:self didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageAllowed];
-            [self.client URLProtocolDidFinishLoading:self];
-        }
-        return;
-    }
-
-    NSRange requestRange = [self requestRange];
-    NSURLResponse *response = [self.cacheWorker cachedResponseForRequestRange:requestRange];
-    if (!response) {
-        [[self.session dataTaskWithRequest:self.request] resume];
-        return;
-    }
+    NSMutableURLRequest *newRequest = [self.request mutableCopy];
+    [NSURLProtocol setProperty:@YES forKey:VIURLProtocolHandledKey inRequest:newRequest];
     
-    [self.client URLProtocol:self didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageAllowed];
-    self.restActions = [[self.cacheWorker cachedDataActionsForRange:requestRange] mutableCopy];
-    [self processActions];
+    __weak typeof(self)weakSelf = self;
+    @synchronized (self.pendingRequests) {
+        NSURLRequest *request = weakSelf.request;
+        [weakSelf.pendingRequests addObject:request];
+        
+        if (weakSelf.pendingRequests.count == 1) {
+            [weakSelf startRequest:request];
+        }
+    }
 }
 
 - (void)stopLoading {
     [self.cacheWorker save];
+    self.cacheWorker = nil;
     [self.restActions removeAllObjects];
     [self.session invalidateAndCancel];
+    self.session = nil;
 }
 
 #pragma mark - Download Logic
+
+- (void)startRequest:(NSURLRequest *)request {
+    if ([request.HTTPMethod isEqualToString:@"HEAD"]) {
+        NSURLResponse *response = [self.cacheWorker cachedResponse];
+        if (!response) {
+            [[self.session dataTaskWithRequest:request] resume];
+        } else {
+            [self.client URLProtocol:self didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageNotAllowed];
+            [self.client URLProtocolDidFinishLoading:self];
+            [self consumePendingRequestIfNeed];
+        }
+        return;
+    }
+    
+    NSRange requestRange = [self requestRange];
+    NSURLResponse *response = [self.cacheWorker cachedResponseForRequestRange:requestRange];
+    if (!response) {
+        [[self.session dataTaskWithRequest:request] resume];
+        return;
+    }
+    
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        [self.client URLProtocol:self didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageNotAllowed];
+    });
+    
+    self.restActions = [[self.cacheWorker cachedDataActionsForRange:requestRange] mutableCopy];
+    [self processActions];
+}
 
 - (void)processActions {
     VICacheAction *action = [self.restActions firstObject];
     if (!action) {
         [self.client URLProtocolDidFinishLoading:self];
+        NSLog(@"finishLoading has not action");
+        [self consumePendingRequestIfNeed];
         return;
     }
     [self.restActions removeObjectAtIndex:0];
@@ -133,6 +131,21 @@
         [request setValue:range forHTTPHeaderField:@"Range"];
         self.startOffset = action.range.location;
         [[self.session dataTaskWithRequest:request] resume];
+    }
+}
+
+#pragma mark - Pending Request
+
+- (void)consumePendingRequestIfNeed {
+    __weak typeof(self)weakSelf = self;
+    @synchronized (self.pendingRequests) {
+        if (weakSelf.pendingRequests.count > 0) {
+            [weakSelf.pendingRequests removeObjectAtIndex:0];
+        }
+        if (weakSelf.pendingRequests.count > 0) {
+            NSURLRequest *request = [weakSelf.pendingRequests firstObject];
+            [weakSelf startRequest:request];
+        }
     }
 }
 
@@ -177,11 +190,46 @@ didReceiveResponse:(NSURLResponse *)response
               task:(NSURLSessionTask *)task
 didCompleteWithError:(nullable NSError *)error {
     if (error) {
-        [self.client URLProtocol:self didFailWithError:error];
+        if (error.code != NSURLErrorCancelled) {
+            [self.client URLProtocol:self didFailWithError:error];
+            NSLog(@"request error %@, request header %@", error, task.currentRequest.allHTTPHeaderFields);
+        } else {
+            NSLog(@"cancel request %@", task.currentRequest.allHTTPHeaderFields);
+        }
+        
+        [self consumePendingRequestIfNeed];
     } else {
         [self.cacheWorker save];
         [self processActions];
     }
+}
+
+#pragma mark - Getter
+
+- (NSURLSession *)session {
+    if (!_session) {
+        NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+        NSOperationQueue *queue = [VICacheSessionManager shared].downloadQueue;
+        _session = [NSURLSession sessionWithConfiguration:configuration delegate:self delegateQueue:queue];
+    }
+    return _session;
+}
+
+- (VIMediaCacheWorker *)cacheWorker {
+    if (!_cacheWorker) {
+        NSString *cacheName = [self.request.URL lastPathComponent];
+        _cacheWorker = [VIMediaCacheWorker inMemoryCacheWorkerWithCacheName:cacheName];
+        NSRange requestRange = [self requestRange];
+        _startOffset = requestRange.location;
+    }
+    return _cacheWorker;
+}
+
+- (NSMutableArray *)pendingRequests {
+    if (!_pendingRequests) {
+        _pendingRequests = [NSMutableArray array];
+    }
+    return _pendingRequests;
 }
 
 @end

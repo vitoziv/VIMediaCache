@@ -62,6 +62,7 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
                 [obj finishLoadingWithError:error];
             }];
         }
+        [weakSelf.pendingRequests removeAllObjects];
     }];
     [task resume];
 }
