@@ -27,6 +27,13 @@
 
 @implementation ViewController
 
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [self.player removeTimeObserver:self.timeObserver];
+    self.timeObserver = nil;
+    [self.player removeObserver:self forKeyPath:@"status"];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setupPlayer];
@@ -58,10 +65,10 @@
 #pragma mark - Setup
 
 - (void)setupPlayer {
-    //    NSURL *url = [NSURL URLWithString:@"https://mvvideo5.meitudata.com/56ea0e90d6cb2653.mp4"];
-    //    NSURL *url = [NSURL URLWithString:@"https://mvvideo5.meitudata.com/56a9e1389b9706520.mp4"];
-    //    NSURL *url = [NSURL URLWithString:@"http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8"];
-    NSURL *url = [NSURL URLWithString:@"https://mvvideo5.meitudata.com/571090934cea5517.mp4"];
+        NSURL *url = [NSURL URLWithString:@"https://mvvideo5.meitudata.com/56ea0e90d6cb2653.mp4"];
+//        NSURL *url = [NSURL URLWithString:@"https://mvvideo5.meitudata.com/56a9e1389b9706520.mp4"];
+//        NSURL *url = [NSURL URLWithString:@"http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8"];
+//    NSURL *url = [NSURL URLWithString:@"https://mvvideo5.meitudata.com/571090934cea5517.mp4"];
     //    NSURL *url = [NSURL URLWithString:@"http://data.5sing.kgimg.com/G061/M0A/03/13/HZQEAFb493iAOeg5AHMiAfzZU0E739.mp3"];
     
     VIResourceLoaderManager *resourceLoaderManager = [VIResourceLoaderManager new];
@@ -112,7 +119,7 @@
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object
                         change:(NSDictionary *)change context:(void *)context {
     if (object == self.player && [keyPath isEqualToString:@"status"]) {
-        NSLog(@"player status %@, rate %@", @(self.player.status), @(self.player.rate));
+        NSLog(@"player status %@, rate %@, error: %@", @(self.player.status), @(self.player.rate), self.player.error);
         if (self.player.status == AVPlayerStatusReadyToPlay) {
             dispatch_async(dispatch_get_main_queue(), ^(void) {
                 CGFloat duration = CMTimeGetSeconds(self.playerItem.duration);
