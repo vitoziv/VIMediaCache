@@ -31,7 +31,7 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [self.player removeTimeObserver:self.timeObserver];
     self.timeObserver = nil;
-    [self.player removeObserver:self forKeyPath:@"status"];
+    [self.playerItem removeObserver:self forKeyPath:@"status"];
 }
 
 - (void)viewDidLoad {
@@ -98,7 +98,7 @@
                                              });
                                          }];
     
-    [self.player addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionNew context:nil];
+    [self.playerItem addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionNew context:nil];
     
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapPlayerViewAction:)];
     [self.playerView addGestureRecognizer:tap];
@@ -118,16 +118,16 @@
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object
                         change:(NSDictionary *)change context:(void *)context {
-    if (object == self.player && [keyPath isEqualToString:@"status"]) {
-        NSLog(@"player status %@, rate %@, error: %@", @(self.player.status), @(self.player.rate), self.player.error);
-        if (self.player.status == AVPlayerStatusReadyToPlay) {
+    if (object == self.playerItem && [keyPath isEqualToString:@"status"]) {
+        NSLog(@"player status %@, rate %@, error: %@", @(self.playerItem.status), @(self.player.rate), self.playerItem.error);
+        if (self.playerItem.status == AVPlayerItemStatusReadyToPlay) {
             dispatch_async(dispatch_get_main_queue(), ^(void) {
                 CGFloat duration = CMTimeGetSeconds(self.playerItem.duration);
                 self.totalTimeLabel.text = [NSString stringWithFormat:@"%.f", duration];
             });
-        } else if (self.player.status == AVPlayerStatusFailed) {
+        } else if (self.playerItem.status == AVPlayerItemStatusFailed) {
             // something went wrong. player.error should contain some information
-            NSLog(@"player error %@", self.player.error);
+            NSLog(@"player error %@", self.playerItem.error);
         }
     }
 }
