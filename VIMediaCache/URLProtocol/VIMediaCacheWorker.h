@@ -7,14 +7,16 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "VICacheConfiguration.h"
 
 @class VICacheAction;
 
 @interface VIMediaCacheWorker : NSObject
 
-+ (instancetype)inMemoryCacheWorkerWithCacheName:(NSString *)cacheName;
-- (instancetype)initWithCacheName:(NSString *)cacheName;
++ (instancetype)inMemoryCacheWorkerWithFilePath:(NSString *)filePath;
+- (instancetype)initWithCacheFilePath:(NSString *)path;
 
+@property (nonatomic, strong, readonly) VICacheConfiguration *cacheConfiguration;
 @property (nonatomic, strong, readonly) NSError *setupError; // Create fileHandler error, can't save/use cache
 
 - (void)cacheData:(NSData *)data forRange:(NSRange)range;

@@ -19,4 +19,6 @@ extern NSString *VICacheContentLengthKey;
 + (void)setCacheDirectory:(NSString *)cacheDirectory;
 + (NSString *)cacheDirectory;
 
++ (NSString *)cachedFilePathForURL:(NSURL *)url;
+
 @end

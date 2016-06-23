@@ -7,7 +7,6 @@
 //
 
 #import "VICacheConfiguration.h"
-#import "VICacheManager.h"
 
 static NSString *kFileNameKey = @"kFileNameKey";
 static NSString *kCacheFragmentsKey = @"kCacheFragmentsKey";
@@ -22,25 +21,17 @@ static NSString *kResponseKey = @"kResponseKey";
 
 @implementation VICacheConfiguration
 
-+ (instancetype)configurationWithFileName:(NSString *)fileName {
-    fileName = [fileName stringByAppendingPathExtension:@"mt_cfg"];
-    
-    NSString *filePath = [[VICacheManager cacheDirectory] stringByAppendingPathComponent:fileName];
++ (instancetype)configurationWithFilePath:(NSString *)filePath {
+    filePath = [filePath stringByAppendingPathExtension:@"mt_cfg"];
     VICacheConfiguration *configuration = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
     
     if (!configuration) {
         configuration = [[VICacheConfiguration alloc] init];
-        configuration.fileName = fileName;
+        configuration.fileName = [filePath lastPathComponent];
+        configuration.filePath = filePath;
     }
     
     return configuration;
-}
-
-- (NSString *)filePath {
-    if (!_filePath) {
-        _filePath = [[VICacheManager cacheDirectory] stringByAppendingPathComponent:self.fileName];
-    }
-    return _filePath;
 }
 
 - (NSArray<NSValue *> *)internalCacheFragments {
@@ -125,14 +116,6 @@ static NSString *kResponseKey = @"kResponseKey";
         
         self.internalCacheFragments = [internalCacheFragments copy];
     }
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:VICacheManagerDidUpdateCacheNotification
-                                                        object:self
-                                                      userInfo:@{
-                                                                 VICacheURLKey: self.response.URL ?: [NSNull null],
-                                                                 VICacheFragmentsKey: self.internalCacheFragments,
-                                                                 VICacheContentLengthKey: @(self.response.expectedContentLength)
-                                                                 }];
 }
 
 #pragma mark - NSCoding

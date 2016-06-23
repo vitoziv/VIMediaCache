@@ -7,9 +7,7 @@
 //
 
 #import "VIMediaCacheWorker.h"
-#import "VICacheConfiguration.h"
 #import "VICacheAction.h"
-#import "VICacheManager.h"
 
 static NSInteger const kPackageLength = 204800; // 200kb per package
 
@@ -32,12 +30,12 @@ static NSInteger const kPackageLength = 204800; // 200kb per package
     return instance;
 }
 
-- (VIMediaCacheWorker *)cacheWorkerWithCacheName:(NSString *)cacheName {
-    VIMediaCacheWorker *cacheWorker = self.memoryCacheWorkers[cacheName];
+- (VIMediaCacheWorker *)cacheWorkerWithFilePath:(NSString *)filePath {
+    VIMediaCacheWorker *cacheWorker = self.memoryCacheWorkers[filePath];
     if (!cacheWorker) {
-        cacheWorker = [[VIMediaCacheWorker alloc] initWithCacheName:cacheName];
-        if (cacheName) {
-            self.memoryCacheWorkers[cacheName] = cacheWorker;
+        cacheWorker = [[VIMediaCacheWorker alloc] initWithCacheFilePath:filePath];
+        if (filePath) {
+            self.memoryCacheWorkers[filePath] = cacheWorker;
         }
     }
     
@@ -63,24 +61,22 @@ static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
 
 @implementation VIMediaCacheWorker
 
-
 - (void)dealloc {
     [_readFileHandle closeFile];
     [_writeFileHandle closeFile];
 }
 
-+ (instancetype)inMemoryCacheWorkerWithCacheName:(NSString *)cacheName {
-    return [[VIMediaCacheWorkerFactory shared] cacheWorkerWithCacheName:cacheName];
++ (instancetype)inMemoryCacheWorkerWithFilePath:(NSString *)filePath {
+    return [[VIMediaCacheWorkerFactory shared] cacheWorkerWithFilePath:filePath];
 }
 
-- (instancetype)initWithCacheName:(NSString *)cacheName {
+- (instancetype)initWithCacheFilePath:(NSString *)path {
     self = [super init];
     if (self) {
         NSFileManager *fileManager = [NSFileManager defaultManager];
-        NSString *cacheFolder = [VICacheManager cacheDirectory];
-        NSString *path = [cacheFolder stringByAppendingPathComponent:cacheName];
         _filePath = path;
         NSError *error;
+        NSString *cacheFolder = [path stringByDeletingLastPathComponent];
         if (![fileManager fileExistsAtPath:cacheFolder]) {
             [fileManager createDirectoryAtPath:cacheFolder
                    withIntermediateDirectories:YES
@@ -96,7 +92,7 @@ static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
             _readFileHandle = [NSFileHandle fileHandleForReadingFromURL:fileURL error:&error];
             if (!error) {
                 _writeFileHandle = [NSFileHandle fileHandleForWritingToURL:fileURL error:&error];
-                _cacheConfiguration = [VICacheConfiguration configurationWithFileName:cacheName];
+                _cacheConfiguration = [VICacheConfiguration configurationWithFilePath:path];
             }
         }
         

@@ -21,7 +21,7 @@ static NSString *kMCMediaCacheDirectory;
 + (void)load {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        [self setCacheDirectory:[NSTemporaryDirectory() stringByAppendingPathComponent:@"mcmedia"]];
+        [self setCacheDirectory:[NSTemporaryDirectory() stringByAppendingPathComponent:@"vimedia"]];
     });
 }
 
@@ -31,6 +31,10 @@ static NSString *kMCMediaCacheDirectory;
 
 + (NSString *)cacheDirectory {
     return kMCMediaCacheDirectory;
+}
+
++ (NSString *)cachedFilePathForURL:(NSURL *)url {
+    return [[self cacheDirectory] stringByAppendingPathComponent:[url lastPathComponent]];
 }
 
 @end

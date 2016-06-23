@@ -10,7 +10,7 @@
 
 @interface VICacheConfiguration : NSObject
 
-+ (instancetype)configurationWithFileName:(NSString *)fileName;
++ (instancetype)configurationWithFilePath:(NSString *)filePath;
 - (void)save;
 
 @property (nonatomic, strong) NSURLResponse *response;

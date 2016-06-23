@@ -10,6 +10,7 @@
 #import "VIMediaCacheWorker.h"
 #import "VICacheAction.h"
 #import "VICacheSessionManager.h"
+#import "VICacheManager.h"
 
 static NSString *const VIURLProtocolHandledKey = @"VIURLProtocolHandledKey";
 
@@ -114,6 +115,7 @@ static NSString *const VIURLProtocolHandledKey = @"VIURLProtocolHandledKey";
     if (!action) {
         [self.client URLProtocolDidFinishLoading:self];
         [self consumePendingRequestIfNeed];
+        [self notifyDownloadProgress];
         return;
     }
     [self.restActions removeObjectAtIndex:0];
@@ -131,6 +133,17 @@ static NSString *const VIURLProtocolHandledKey = @"VIURLProtocolHandledKey";
         self.startOffset = action.range.location;
         [[self.session dataTaskWithRequest:request] resume];
     }
+}
+
+- (void)notifyDownloadProgress {
+    VICacheConfiguration *configuration = self.cacheWorker.cacheConfiguration;
+    [[NSNotificationCenter defaultCenter] postNotificationName:VICacheManagerDidUpdateCacheNotification
+                                                        object:self
+                                                      userInfo:@{
+                                                                 VICacheURLKey: configuration.response.URL ?: [NSNull null],
+                                                                 VICacheFragmentsKey: configuration.cacheFragments,
+                                                                 VICacheContentLengthKey: @(configuration.response.expectedContentLength)
+                                                                 }];
 }
 
 #pragma mark - Pending Request
@@ -183,6 +196,8 @@ didReceiveResponse:(NSURLResponse *)response
     [self.cacheWorker cacheData:data forRange:range];
     self.startOffset += data.length;
     [self.client URLProtocol:self didLoadData:data];
+    
+    [self notifyDownloadProgress];
 }
 
 - (void)URLSession:(NSURLSession *)session
@@ -216,8 +231,8 @@ didCompleteWithError:(nullable NSError *)error {
 
 - (VIMediaCacheWorker *)cacheWorker {
     if (!_cacheWorker) {
-        NSString *cacheName = [self.request.URL lastPathComponent];
-        _cacheWorker = [VIMediaCacheWorker inMemoryCacheWorkerWithCacheName:cacheName];
+        NSString *filePath = [VICacheManager cachedFilePathForURL:self.request.URL];
+        _cacheWorker = [VIMediaCacheWorker inMemoryCacheWorkerWithFilePath:filePath];
         NSRange requestRange = [self requestRange];
         _startOffset = requestRange.location;
     }
