@@ -8,13 +8,24 @@
 
 #import <Foundation/Foundation.h>
 
-@interface VICacheConfiguration : NSObject
+@interface VICacheConfiguration : NSObject <NSMutableCopying, NSCopying>
 
 + (instancetype)configurationWithFilePath:(NSString *)filePath;
-- (void)save;
 
-@property (nonatomic, strong) NSURLResponse *response;
+@property (nonatomic, strong, readonly) NSURLResponse *response;
 - (NSArray<NSValue *> *)cacheFragments;
+
+/**
+ *  cached progress
+ */
+@property (nonatomic, readonly) float progress;
+
+@end
+
+@interface VIMutableCacheConfiguration : VICacheConfiguration
+
+- (void)updateResponse:(NSURLResponse *)response;
+- (void)save;
 - (void)addCacheFragment:(NSRange)fragment;
 
 @end

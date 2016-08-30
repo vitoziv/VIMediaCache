@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "VICacheConfiguration.h"
 
 extern NSString *VICacheManagerDidUpdateCacheNotification;
 
@@ -20,5 +21,6 @@ extern NSString *VICacheContentLengthKey;
 + (NSString *)cacheDirectory;
 
 + (NSString *)cachedFilePathForURL:(NSURL *)url;
++ (VICacheConfiguration *)cacheConfigurationForURL:(NSURL *)url;
 
 @end

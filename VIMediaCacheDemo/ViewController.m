@@ -77,8 +77,13 @@
     AVPlayerItem *playerItem = [resourceLoaderManager playerItemWithURL:url];
     self.playerItem = playerItem;
     
+    VICacheConfiguration *configuration = [VICacheManager cacheConfigurationForURL:url];
+    if (configuration.progress >= 1.0) {
+        NSLog(@"cache completed");
+    }
+    
     AVPlayer *player = [AVPlayer playerWithPlayerItem:playerItem];
-    //    AVPlayer *player = [AVPlayer playerWithURL:url];
+//    AVPlayer *player = [AVPlayer playerWithURL:url];
     self.player = player;
     [self.playerView setPlayer:player];
     

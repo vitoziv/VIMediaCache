@@ -37,4 +37,10 @@ static NSString *kMCMediaCacheDirectory;
     return [[self cacheDirectory] stringByAppendingPathComponent:[url lastPathComponent]];
 }
 
++ (VICacheConfiguration *)cacheConfigurationForURL:(NSURL *)url {
+    NSString *filePath = [self cachedFilePathForURL:url];
+    VICacheConfiguration *configuration = [VICacheConfiguration configurationWithFilePath:filePath];
+    return configuration;
+}
+
 @end

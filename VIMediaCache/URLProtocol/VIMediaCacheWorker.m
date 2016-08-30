@@ -53,7 +53,7 @@ static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
 @property (nonatomic, strong) NSFileHandle *writeFileHandle;
 @property (nonatomic, strong, readwrite) NSError *setupError;
 @property (nonatomic, copy) NSString *filePath;
-@property (nonatomic, strong) VICacheConfiguration *cacheConfiguration;
+@property (nonatomic, strong) VIMutableCacheConfiguration *internalCacheConfiguration;
 
 @property (nonatomic) long long currentOffset;
 
@@ -92,7 +92,7 @@ static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
             _readFileHandle = [NSFileHandle fileHandleForReadingFromURL:fileURL error:&error];
             if (!error) {
                 _writeFileHandle = [NSFileHandle fileHandleForWritingToURL:fileURL error:&error];
-                _cacheConfiguration = [VICacheConfiguration configurationWithFilePath:path];
+                _internalCacheConfiguration = [VIMutableCacheConfiguration configurationWithFilePath:path];
             }
         }
         
@@ -101,12 +101,16 @@ static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
     return self;
 }
 
+- (VICacheConfiguration *)cacheConfiguration {
+    return [self.internalCacheConfiguration copy];
+}
+
 - (void)cacheData:(NSData *)data forRange:(NSRange)range {
     @synchronized(self.writeFileHandle) {
         @try {
             [self.writeFileHandle seekToFileOffset:range.location];
             [self.writeFileHandle writeData:data];
-            [self.cacheConfiguration addCacheFragment:range];
+            [self.internalCacheConfiguration addCacheFragment:range];
             [self save];
         } @catch (NSException *exception) {
             NSLog(@"write to file error");
@@ -207,7 +211,7 @@ static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
 
 - (void)setCacheResponse:(NSURLResponse *)response {
     @synchronized (self.writeFileHandle) {
-        self.cacheConfiguration.response = response;
+        [self.internalCacheConfiguration updateResponse:response];
         
         [self.writeFileHandle truncateFileAtOffset:response.expectedContentLength];
         [self.writeFileHandle synchronizeFile];
@@ -237,7 +241,7 @@ static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
 - (void)save {
     @synchronized (self.writeFileHandle) {
         [self.writeFileHandle synchronizeFile];
-        [self.cacheConfiguration save];
+        [self.internalCacheConfiguration save];
     }
 }
 

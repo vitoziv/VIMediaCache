@@ -13,6 +13,8 @@ static NSString *kCacheFragmentsKey = @"kCacheFragmentsKey";
 static NSString *kResponseKey = @"kResponseKey";
 
 @interface VICacheConfiguration () <NSCoding>
+
+@property (nonatomic, strong) NSURLResponse *response;
 @property (nonatomic, copy) NSString *filePath;
 @property (nonatomic, copy) NSString *fileName;
 @property (nonatomic, copy) NSArray<NSValue *> *internalCacheFragments;
@@ -28,10 +30,10 @@ static NSString *kResponseKey = @"kResponseKey";
     if (!configuration) {
         configuration = [[VICacheConfiguration alloc] init];
         configuration.fileName = [filePath lastPathComponent];
-        configuration.filePath = filePath;
     }
+    configuration.filePath = filePath;
     
-    return configuration;
+    return [configuration copy];
 }
 
 - (NSArray<NSValue *> *)internalCacheFragments {
@@ -41,6 +43,80 @@ static NSString *kResponseKey = @"kResponseKey";
     return _internalCacheFragments;
 }
 
+
+- (NSArray<NSValue *> *)cacheFragments {
+    return [_internalCacheFragments copy];
+}
+
+- (float)progress {
+    __block float progress = 0;
+    @synchronized (self.internalCacheFragments) {
+        [self.internalCacheFragments enumerateObjectsUsingBlock:^(NSValue * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            NSRange range = obj.rangeValue;
+            progress += range.length;
+        }];
+        progress /= self.response.expectedContentLength;
+    }
+    return progress;
+}
+
+#pragma mark - NSCoding
+
+- (void)encodeWithCoder:(NSCoder *)aCoder {
+    [aCoder encodeObject:self.fileName forKey:kFileNameKey];
+    [aCoder encodeObject:self.internalCacheFragments forKey:kCacheFragmentsKey];
+    [aCoder encodeObject:self.response forKey:kResponseKey];
+}
+
+- (nullable instancetype)initWithCoder:(NSCoder *)aDecoder {
+    self = [super init];
+    if (self) {
+        _fileName = [aDecoder decodeObjectForKey:kFileNameKey];
+        _internalCacheFragments = [[aDecoder decodeObjectForKey:kCacheFragmentsKey] mutableCopy];
+        if (!_internalCacheFragments) {
+            _internalCacheFragments = [NSArray array];
+        }
+        _response = [aDecoder decodeObjectForKey:kResponseKey];
+    }
+    return self;
+}
+
+#pragma mark - NSCopying
+
+- (id)copyWithZone:(nullable NSZone *)zone {
+    VICacheConfiguration *configuration = [[VICacheConfiguration allocWithZone:zone] init];
+    configuration.fileName = self.fileName;
+    configuration.filePath = self.filePath;
+    configuration.internalCacheFragments = self.internalCacheFragments;
+    configuration.response = [self.response copy];
+    
+    return configuration;
+}
+
+#pragma mark - NSMutableCopying
+
+- (id)mutableCopyWithZone:(nullable NSZone *)zone {
+    VIMutableCacheConfiguration *configuration = [[VIMutableCacheConfiguration allocWithZone:zone] init];
+    configuration.fileName = self.fileName;
+    configuration.filePath = self.filePath;
+    configuration.internalCacheFragments = self.internalCacheFragments;
+    configuration.response = [self.response copy];
+    
+    return configuration;
+}
+
+@end
+
+@implementation VIMutableCacheConfiguration
+
++ (instancetype)configurationWithFilePath:(NSString *)filePath {
+    return [[super configurationWithFilePath:filePath] mutableCopy];
+}
+
+- (void)updateResponse:(NSURLResponse *)response {
+    self.response = response;
+}
+
 - (void)save {
     @synchronized (self.internalCacheFragments) {
         BOOL success = [NSKeyedArchiver archiveRootObject:self toFile:self.filePath];
@@ -48,10 +124,6 @@ static NSString *kResponseKey = @"kResponseKey";
             NSLog(@"#warning save configuration %@ failed", self.filePath);
         }
     }
-}
-
-- (NSArray<NSValue *> *)cacheFragments {
-    return [_internalCacheFragments copy];
 }
 
 - (void)addCacheFragment:(NSRange)fragment {
@@ -116,27 +188,6 @@ static NSString *kResponseKey = @"kResponseKey";
         
         self.internalCacheFragments = [internalCacheFragments copy];
     }
-}
-
-#pragma mark - NSCoding
-
-- (void)encodeWithCoder:(NSCoder *)aCoder {
-    [aCoder encodeObject:self.fileName forKey:kFileNameKey];
-    [aCoder encodeObject:self.internalCacheFragments forKey:kCacheFragmentsKey];
-    [aCoder encodeObject:self.response forKey:kResponseKey];
-}
-
-- (nullable instancetype)initWithCoder:(NSCoder *)aDecoder {
-    self = [super init];
-    if (self) {
-        _fileName = [aDecoder decodeObjectForKey:kFileNameKey];
-        _internalCacheFragments = [[aDecoder decodeObjectForKey:kCacheFragmentsKey] mutableCopy];
-        if (!_internalCacheFragments) {
-            _internalCacheFragments = [NSArray array];
-        }
-        _response = [aDecoder decodeObjectForKey:kResponseKey];
-    }
-    return self;
 }
 
 @end
