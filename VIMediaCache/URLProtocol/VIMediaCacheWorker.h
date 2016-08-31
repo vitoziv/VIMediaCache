@@ -29,4 +29,7 @@
 
 - (void)save;
 
+- (void)startWritting;
+- (void)finishWritting;
+
 @end

@@ -12,6 +12,8 @@
 
 + (instancetype)configurationWithFilePath:(NSString *)filePath;
 
+@property (nonatomic, copy, readonly) NSString *filePath;
+
 @property (nonatomic, strong, readonly) NSURLResponse *response;
 - (NSArray<NSValue *> *)cacheFragments;
 
@@ -19,6 +21,8 @@
  *  cached progress
  */
 @property (nonatomic, readonly) float progress;
+@property (nonatomic, readonly) long long downloadedBytes;
+@property (nonatomic, readonly) float downloadSpeed; // kb/s
 
 @end
 
@@ -27,5 +31,10 @@
 - (void)updateResponse:(NSURLResponse *)response;
 - (void)save;
 - (void)addCacheFragment:(NSRange)fragment;
+
+/**
+ *  Record the download speed
+ */
+- (void)addDownloadedBytes:(long long)bytes spent:(NSTimeInterval)time;
 
 @end

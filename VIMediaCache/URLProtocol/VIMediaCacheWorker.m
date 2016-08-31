@@ -57,6 +57,10 @@ static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
 
 @property (nonatomic) long long currentOffset;
 
+@property (nonatomic) BOOL writting;
+@property (nonatomic, strong) NSDate *startWriteDate;
+@property (nonatomic) float writeBytes;
+
 @end
 
 @implementation VIMediaCacheWorker
@@ -106,6 +110,12 @@ static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
 }
 
 - (void)cacheData:(NSData *)data forRange:(NSRange)range {
+    if (!self.writting) {
+        return;
+    }
+    
+    self.writeBytes += data.length;
+    
     @synchronized(self.writeFileHandle) {
         @try {
             [self.writeFileHandle seekToFileOffset:range.location];
@@ -132,7 +142,7 @@ static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
 }
 
 - (NSArray<VICacheAction *> *)cachedDataActionsForRange:(NSRange)range {
-    NSArray *cachedFragments = [self.cacheConfiguration cacheFragments];
+    NSArray *cachedFragments = [self.internalCacheConfiguration cacheFragments];
     NSMutableArray *actions = [NSMutableArray array];
     
     if (range.location == NSNotFound) {
@@ -219,7 +229,7 @@ static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
 }
 
 - (NSURLResponse *)cachedResponse {
-    return self.cacheConfiguration.response;
+    return self.internalCacheConfiguration.response;
 }
 
 - (NSURLResponse *)cachedResponseForRequestRange:(NSRange)range {
@@ -242,6 +252,22 @@ static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
     @synchronized (self.writeFileHandle) {
         [self.writeFileHandle synchronizeFile];
         [self.internalCacheConfiguration save];
+    }
+}
+
+- (void)startWritting {
+    if (!self.writting) {
+        self.writting = YES;
+        self.startWriteDate = [NSDate date];
+        self.writeBytes = 0;
+    }
+}
+
+- (void)finishWritting {
+    if (self.writting) {
+        self.writting = NO;
+        NSTimeInterval time = [[NSDate date] timeIntervalSinceDate:self.startWriteDate];
+        [self.internalCacheConfiguration addDownloadedBytes:self.writeBytes spent:time];
     }
 }
 

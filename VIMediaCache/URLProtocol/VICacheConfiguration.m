@@ -11,6 +11,7 @@
 static NSString *kFileNameKey = @"kFileNameKey";
 static NSString *kCacheFragmentsKey = @"kCacheFragmentsKey";
 static NSString *kResponseKey = @"kResponseKey";
+static NSString *kDownloadInfoKey = @"kDownloadInfoKey";
 
 @interface VICacheConfiguration () <NSCoding>
 
@@ -18,6 +19,7 @@ static NSString *kResponseKey = @"kResponseKey";
 @property (nonatomic, copy) NSString *filePath;
 @property (nonatomic, copy) NSString *fileName;
 @property (nonatomic, copy) NSArray<NSValue *> *internalCacheFragments;
+@property (nonatomic, copy) NSArray *downloadInfo;
 
 @end
 
@@ -43,21 +45,42 @@ static NSString *kResponseKey = @"kResponseKey";
     return _internalCacheFragments;
 }
 
+- (NSArray *)downloadInfo {
+    if (!_downloadInfo) {
+        _downloadInfo = [NSArray array];
+    }
+    return _downloadInfo;
+}
 
 - (NSArray<NSValue *> *)cacheFragments {
     return [_internalCacheFragments copy];
 }
 
 - (float)progress {
-    __block float progress = 0;
-    @synchronized (self.internalCacheFragments) {
-        [self.internalCacheFragments enumerateObjectsUsingBlock:^(NSValue * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            NSRange range = obj.rangeValue;
-            progress += range.length;
-        }];
-        progress /= self.response.expectedContentLength;
-    }
+    float progress = self.downloadedBytes / self.response.expectedContentLength;
     return progress;
+}
+
+- (long long)downloadedBytes {
+    float bytes = 0;
+    @synchronized (self.internalCacheFragments) {
+        for (NSValue *range in self.internalCacheFragments) {
+            bytes += range.rangeValue.length;
+        }
+    }
+    return bytes;
+}
+
+- (float)downloadSpeed {
+    long long bytes = 0;
+    NSTimeInterval time = 0;
+    @synchronized (self.downloadInfo) {
+        for (NSArray *a in self.downloadInfo) {
+            bytes += [[a firstObject] longLongValue];
+            time += [[a lastObject] doubleValue];
+        }
+    }
+    return bytes / 1024.0 / time;
 }
 
 #pragma mark - NSCoding
@@ -66,6 +89,7 @@ static NSString *kResponseKey = @"kResponseKey";
     [aCoder encodeObject:self.fileName forKey:kFileNameKey];
     [aCoder encodeObject:self.internalCacheFragments forKey:kCacheFragmentsKey];
     [aCoder encodeObject:self.response forKey:kResponseKey];
+    [aCoder encodeObject:self.downloadInfo forKey:kDownloadInfoKey];
 }
 
 - (nullable instancetype)initWithCoder:(NSCoder *)aDecoder {
@@ -77,6 +101,7 @@ static NSString *kResponseKey = @"kResponseKey";
             _internalCacheFragments = [NSArray array];
         }
         _response = [aDecoder decodeObjectForKey:kResponseKey];
+        _downloadInfo = [aDecoder decodeObjectForKey:kDownloadInfoKey];
     }
     return self;
 }
@@ -89,6 +114,7 @@ static NSString *kResponseKey = @"kResponseKey";
     configuration.filePath = self.filePath;
     configuration.internalCacheFragments = self.internalCacheFragments;
     configuration.response = [self.response copy];
+    configuration.downloadInfo = self.downloadInfo;
     
     return configuration;
 }
@@ -101,6 +127,7 @@ static NSString *kResponseKey = @"kResponseKey";
     configuration.filePath = self.filePath;
     configuration.internalCacheFragments = self.internalCacheFragments;
     configuration.response = [self.response copy];
+    configuration.downloadInfo = self.downloadInfo;
     
     return configuration;
 }
@@ -187,6 +214,12 @@ static NSString *kResponseKey = @"kResponseKey";
         }
         
         self.internalCacheFragments = [internalCacheFragments copy];
+    }
+}
+
+- (void)addDownloadedBytes:(long long)bytes spent:(NSTimeInterval)time {
+    @synchronized (self.downloadInfo) {
+        self.downloadInfo = [self.downloadInfo arrayByAddingObject:@[@(bytes), @(time)]];
     }
 }
 
