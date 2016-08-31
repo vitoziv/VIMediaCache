@@ -12,5 +12,6 @@
 #import "VIResourceLoaderManager.h"
 #import "VICacheManager.h"
 #import "VIMediaDownloader.h"
+#import "VIContentInfo.h"
 
 #endif /* VIMediaCache_h */
