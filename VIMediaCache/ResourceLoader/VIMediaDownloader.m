@@ -99,7 +99,8 @@
 
 #pragma mark - NSURLSessionDataDelegate
 
-- (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask
+- (void)URLSession:(NSURLSession *)session
+          dataTask:(NSURLSessionDataTask *)dataTask
 didReceiveResponse:(NSURLResponse *)response
  completionHandler:(void (^)(NSURLSessionResponseDisposition disposition))completionHandler {
     NSString *mimeType = response.MIMEType;
@@ -113,16 +114,18 @@ didReceiveResponse:(NSURLResponse *)response
     }
 }
 
-- (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask
-    didReceiveData:(NSData *)data {
+- (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveData:(NSData *)data {
     id<MediaDownloaderDelegate> delegate = self.taskDelegateDic[dataTask];
-    [delegate mediaDownloader:self didReceiveData:data];
+    if ([delegate respondsToSelector:@selector(mediaDownloader:didReceiveData:)]) {
+        [delegate mediaDownloader:self didReceiveData:data];
+    }
 }
 
-- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task
-didCompleteWithError:(nullable NSError *)error {
+- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(nullable NSError *)error {
     id<MediaDownloaderDelegate> delegate = self.taskDelegateDic[task];
-    [delegate mediaDownloader:self didFinishedWithError:error];
+    if ([delegate respondsToSelector:@selector(mediaDownloader:didFinishedWithError:)]) {
+        [delegate mediaDownloader:self didFinishedWithError:error];
+    }
     [self.taskDelegateDic removeObjectForKey:task];
 }
 

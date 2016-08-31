@@ -28,6 +28,7 @@
 
 @protocol MediaDownloaderDelegate <NSObject>
 
+@optional
 - (void)mediaDownloader:(VIMediaDownloader *)downloader didReceiveData:(NSData *)data;
 - (void)mediaDownloader:(VIMediaDownloader *)downloader didFinishedWithError:(NSError *)error;
 
