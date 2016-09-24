@@ -57,9 +57,9 @@ static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
 
 @property (nonatomic) long long currentOffset;
 
-@property (nonatomic) BOOL writting;
 @property (nonatomic, strong) NSDate *startWriteDate;
 @property (nonatomic) float writeBytes;
+@property (nonatomic) BOOL writting;
 
 @end
 
@@ -110,16 +110,11 @@ static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
 }
 
 - (void)cacheData:(NSData *)data forRange:(NSRange)range {
-    if (!self.writting) {
-        return;
-    }
-    
-    self.writeBytes += data.length;
-    
     @synchronized(self.writeFileHandle) {
         @try {
             [self.writeFileHandle seekToFileOffset:range.location];
             [self.writeFileHandle writeData:data];
+            self.writeBytes += data.length;
             [self.internalCacheConfiguration addCacheFragment:range];
             [self save];
         } @catch (NSException *exception) {
@@ -256,11 +251,9 @@ static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
 }
 
 - (void)startWritting {
-    if (!self.writting) {
-        self.writting = YES;
-        self.startWriteDate = [NSDate date];
-        self.writeBytes = 0;
-    }
+    self.writting = YES;
+    self.startWriteDate = [NSDate date];
+    self.writeBytes = 0;
 }
 
 - (void)finishWritting {

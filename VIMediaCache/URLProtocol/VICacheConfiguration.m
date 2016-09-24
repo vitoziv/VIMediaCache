@@ -57,7 +57,7 @@ static NSString *kDownloadInfoKey = @"kDownloadInfoKey";
 }
 
 - (float)progress {
-    float progress = self.downloadedBytes / self.response.expectedContentLength;
+    float progress = self.downloadedBytes / (float)self.response.expectedContentLength;
     return progress;
 }
 

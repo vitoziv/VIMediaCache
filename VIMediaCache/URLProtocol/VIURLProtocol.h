@@ -10,4 +10,7 @@
 
 @interface VIURLProtocol : NSURLProtocol
 
++ (void)setRequestRange:(NSRange)range inRequest:(NSMutableURLRequest *)request;
++ (void)setRequestToEndInRequest:(NSMutableURLRequest *)request;
+
 @end

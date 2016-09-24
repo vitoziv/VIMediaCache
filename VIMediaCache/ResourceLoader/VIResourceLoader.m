@@ -15,6 +15,7 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
 
 @interface VIResourceLoader () <VIResourceLoadingRequestWorkerDelegate>
 
+@property (nonatomic, strong) NSURL *url;
 @property (nonatomic, strong) VIMediaDownloader *mediaDownloader;
 @property (nonatomic, strong) NSMutableDictionary *pendingRequestWorkers;
 @property (nonatomic, strong) NSMutableArray<AVAssetResourceLoadingRequest *> *pendingRequests;
@@ -34,6 +35,7 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
 - (instancetype)initWithURL:(NSURL *)url {
     self = [super init];
     if (self) {
+        _url = url;
         _mediaDownloader = [[VIMediaDownloader alloc] initWithURL:url];
         _pendingRequestWorkers = [NSMutableDictionary dictionary];
         _pendingRequests = [NSMutableArray array];
@@ -50,7 +52,7 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
 
 - (void)prepareForLoading {
     __weak typeof(self)weakSelf = self;
-    NSURLSessionDataTask *task = [self.mediaDownloader fetchFileInfoTaskWithCompletion:^(VIContentInfo *info, NSError *error) {
+    [self.mediaDownloader fetchFileInfoTaskWithCompletion:^(VIContentInfo *info, NSError *error) {
         if (!error) {
             weakSelf.info = info;
             [weakSelf.pendingRequests enumerateObjectsUsingBlock:^(AVAssetResourceLoadingRequest * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -64,7 +66,6 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
         }
         [weakSelf.pendingRequests removeAllObjects];
     }];
-    [task resume];
 }
 
 - (void)addRequest:(AVAssetResourceLoadingRequest *)request {
@@ -75,8 +76,10 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
         }
         
         [self.pendingRequestWorkers enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, VIResourceLoadingRequestWorker * _Nonnull obj, BOOL * _Nonnull stop) {
-            [obj cancel];
+            NSLog(@"finish request worker: %@", obj);
+            [obj finish];
         }];
+        [self.pendingRequestWorkers removeAllObjects];
         
         // Fullfill content information
         AVAssetResourceLoadingContentInformationRequest *contentInformationRequest = request.contentInformationRequest;
@@ -107,6 +110,7 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
 }
 
 - (void)cancel {
+    NSLog(@"%@, %@", self, NSStringFromSelector(_cmd));
     self.cancelled = YES;
     [self.mediaDownloader invalidateAndCancel];
 }
@@ -114,23 +118,26 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
 #pragma mark - VIResourceLoadingRequestWorkerDelegate
 
 - (void)resourceLoadingRequestWorkerDidComplete:(VIResourceLoadingRequestWorker *)requestWorker {
+    NSLog(@"%@, %@", self, NSStringFromSelector(_cmd));
     [self removeRequest:requestWorker.request];
     
-    // Start previous canceled request
+    // Start previous cancelled request
     NSDictionary *pendingRequestWorkers = [self.pendingRequestWorkers copy];
     if (pendingRequestWorkers.count > 0) {
-        NSString *key = [[pendingRequestWorkers allKeys] lastObject];
-        VIResourceLoadingRequestWorker *previousRequestWorker = (VIResourceLoadingRequestWorker *)pendingRequestWorkers[key];
-        [self startWorkerWithRequest:previousRequestWorker.request];
+        NSLog(@"*** try to start previous cancelled request");
+        //        NSString *key = [[pendingRequestWorkers allKeys] lastObject];
+        //        VIResourceLoadingRequestWorker *previousRequestWorker = (VIResourceLoadingRequestWorker *)pendingRequestWorkers[key];
+        //        [self startWorkerWithRequest:previousRequestWorker.request];
     }
 }
 
 #pragma mark - Helper
 
 - (void)startWorkerWithRequest:(AVAssetResourceLoadingRequest *)request {
+    NSLog(@"%@, %@", self, NSStringFromSelector(_cmd));
     NSString *key = [self keyForRequest:request];
     VIResourceLoadingRequestWorker *requestWorker = [[VIResourceLoadingRequestWorker alloc] initWithMediaDownloader:self.mediaDownloader
-                                                                                                 resourceLoadingRequest:request];
+                                                                                             resourceLoadingRequest:request];
     requestWorker.delegate = self;
     self.pendingRequestWorkers[key] = requestWorker;
     [requestWorker startWork];

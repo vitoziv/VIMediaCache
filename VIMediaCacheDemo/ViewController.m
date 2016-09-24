@@ -65,25 +65,25 @@
 #pragma mark - Setup
 
 - (void)setupPlayer {
-        NSURL *url = [NSURL URLWithString:@"https://mvvideo5.meitudata.com/56ea0e90d6cb2653.mp4"];
+//        NSURL *url = [NSURL URLWithString:@"https://mvvideo5.meitudata.com/56ea0e90d6cb2653.mp4"];
 //        NSURL *url = [NSURL URLWithString:@"https://mvvideo5.meitudata.com/56a9e1389b9706520.mp4"];
-//        NSURL *url = [NSURL URLWithString:@"http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8"];
+        NSURL *url = [NSURL URLWithString:@"http://media-test.1iptv.com/recordings/z1.meipai-live-test.57d15a1f1013858cda04d060/z157d15a1f1013858cda04d060.m3u8?start=-1&end=-1"];
 //    NSURL *url = [NSURL URLWithString:@"https://mvvideo5.meitudata.com/571090934cea5517.mp4"];
     //    NSURL *url = [NSURL URLWithString:@"http://data.5sing.kgimg.com/G061/M0A/03/13/HZQEAFb493iAOeg5AHMiAfzZU0E739.mp3"];
     
-    VIResourceLoaderManager *resourceLoaderManager = [VIResourceLoaderManager new];
-    self.resourceLoaderManager = resourceLoaderManager;
-    
-    AVPlayerItem *playerItem = [resourceLoaderManager playerItemWithURL:url];
-    self.playerItem = playerItem;
-    
-    VICacheConfiguration *configuration = [VICacheManager cacheConfigurationForURL:url];
-    if (configuration.progress >= 1.0) {
-        NSLog(@"cache completed");
-    }
-    
-    AVPlayer *player = [AVPlayer playerWithPlayerItem:playerItem];
-//    AVPlayer *player = [AVPlayer playerWithURL:url];
+//    VIResourceLoaderManager *resourceLoaderManager = [VIResourceLoaderManager new];
+//    self.resourceLoaderManager = resourceLoaderManager;
+//    
+//    AVPlayerItem *playerItem = [resourceLoaderManager playerItemWithURL:url];
+//    self.playerItem = playerItem;
+//    
+//    VICacheConfiguration *configuration = [VICacheManager cacheConfigurationForURL:url];
+//    if (configuration.progress >= 1.0) {
+//        NSLog(@"cache completed");
+//    }
+//
+//    AVPlayer *player = [AVPlayer playerWithPlayerItem:playerItem];
+    AVPlayer *player = [AVPlayer playerWithURL:url];
     self.player = player;
     [self.playerView setPlayer:player];
     

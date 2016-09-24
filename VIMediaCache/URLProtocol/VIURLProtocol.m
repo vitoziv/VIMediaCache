@@ -13,6 +13,8 @@
 #import "VICacheManager.h"
 
 static NSString *const VIURLProtocolHandledKey = @"VIURLProtocolHandledKey";
+static NSString *const VIURLRequestRangeKey = @"VIURLRequestRangeKey";
+static NSString *const VIURLRequestToEndKey = @"VIURLRequestToEndKey";
 
 @interface VIURLProtocol () <NSURLSessionDataDelegate>
 
@@ -27,6 +29,28 @@ static NSString *const VIURLProtocolHandledKey = @"VIURLProtocolHandledKey";
 @end
 
 @implementation VIURLProtocol
+
++ (void)setRequestRange:(NSRange)range inRequest:(NSMutableURLRequest *)request {
+    [NSURLProtocol setProperty:NSStringFromRange(range) forKey:VIURLRequestRangeKey inRequest:request];
+}
+
++ (NSRange)requestRagneInRequest:(NSMutableURLRequest *)request {
+    NSString *rangeStr = [NSURLProtocol propertyForKey:VIURLRequestRangeKey inRequest:request];
+    if (rangeStr) {
+        NSRange range = NSRangeFromString(rangeStr);
+        return range;
+    }
+    return NSMakeRange(NSNotFound, 0);
+}
+
++ (void)setRequestToEndInRequest:(NSMutableURLRequest *)request {
+    [NSURLProtocol setProperty:@(YES) forKey:VIURLRequestToEndKey inRequest:request];
+}
+
++ (BOOL)requestToEndInRequest:(NSMutableURLRequest *)request {
+    NSNumber *toEnd = [NSURLProtocol propertyForKey:VIURLRequestToEndKey inRequest:request];
+    return [toEnd boolValue];
+}
 
 #pragma mark - Override
 
@@ -60,6 +84,7 @@ static NSString *const VIURLProtocolHandledKey = @"VIURLProtocolHandledKey";
     NSMutableURLRequest *newRequest = [self.request mutableCopy];
     [NSURLProtocol setProperty:@YES forKey:VIURLProtocolHandledKey inRequest:newRequest];
     
+    //    NSLog(@"%@ start loading request %@", self, self.request);
     __weak typeof(self)weakSelf = self;
     @synchronized (self.pendingRequests) {
         NSURLRequest *request = weakSelf.request;
@@ -94,7 +119,21 @@ static NSString *const VIURLProtocolHandledKey = @"VIURLProtocolHandledKey";
         return;
     }
     
+    
+    
     NSRange requestRange = [self requestRange];
+    
+    long long expectedContentLength = self.cacheWorker.cachedResponse.expectedContentLength;
+    if (requestRange.location + requestRange.length > expectedContentLength) {
+        NSLog(@"too big reset range: %@, excpetLength: %@", NSStringFromRange(requestRange), @(expectedContentLength));
+    }
+    
+    BOOL toEnd = [VIURLProtocol requestToEndInRequest:self.request];
+    if (toEnd) {
+        NSLog(@"request to end");
+        requestRange.length = (expectedContentLength - requestRange.location);
+    }
+    
     NSURLResponse *response = [self.cacheWorker cachedResponseForRequestRange:requestRange];
     if (!response) {
         [[self.session dataTaskWithRequest:request] resume];
@@ -107,6 +146,7 @@ static NSString *const VIURLProtocolHandledKey = @"VIURLProtocolHandledKey";
     });
     
     self.restActions = [[self.cacheWorker cachedDataActionsForRange:requestRange] mutableCopy];
+    
     [self processActions];
 }
 
@@ -137,6 +177,7 @@ static NSString *const VIURLProtocolHandledKey = @"VIURLProtocolHandledKey";
 
 - (void)notifyDownloadProgress {
     VICacheConfiguration *configuration = self.cacheWorker.cacheConfiguration;
+    NSLog(@"notifyDownloadProgress %@, fragments: %@, exceptLength: %@", @(configuration.progress), configuration.cacheFragments, @(configuration.response.expectedContentLength));
     [[NSNotificationCenter defaultCenter] postNotificationName:VICacheManagerDidUpdateCacheNotification
                                                         object:self
                                                       userInfo:@{
@@ -164,15 +205,9 @@ static NSString *const VIURLProtocolHandledKey = @"VIURLProtocolHandledKey";
 #pragma mark - Cache
 
 - (NSRange)requestRange {
-    NSString *range = self.request.allHTTPHeaderFields[@"range"];
-    if (range) {
-        range = [range substringFromIndex:6];
-        NSArray *rangeArr = [range componentsSeparatedByString:@"-"];
-        NSInteger startOffset = [[rangeArr firstObject] integerValue];
-        NSInteger endOffset = [[rangeArr lastObject] integerValue];
-        return NSMakeRange(startOffset, endOffset - startOffset + 1);
-    }
-    return NSMakeRange(NSNotFound, 0);
+    NSRange range = [VIURLProtocol requestRagneInRequest:self.request];
+    
+    return range;
 }
 
 #pragma mark - NSURLSessionDataDelegate
@@ -185,6 +220,8 @@ didReceiveResponse:(NSURLResponse *)response
         [self.cacheWorker setCacheResponse:response];
         [self.client URLProtocol:self didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageAllowed];
     }
+    
+    [self.cacheWorker startWritting];
     
     completionHandler(NSURLSessionResponseAllow);
 }
@@ -213,9 +250,10 @@ didCompleteWithError:(nullable NSError *)error {
         
         [self consumePendingRequestIfNeed];
     } else {
-        [self.cacheWorker save];
         [self processActions];
     }
+    [self.cacheWorker finishWritting];
+    [self.cacheWorker save];
 }
 
 #pragma mark - Getter

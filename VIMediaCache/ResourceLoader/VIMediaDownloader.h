@@ -15,13 +15,15 @@
 
 - (instancetype)initWithURL:(NSURL *)url;
 @property (nonatomic, strong, readonly) NSURL *url;
+@property (nonatomic, weak) id<MediaDownloaderDelegate> delegate;
 
-- (NSURLSessionDataTask *)fetchFileInfoTaskWithCompletion:(void(^)(VIContentInfo *info, NSError *error))completion;
+- (void)fetchFileInfoTaskWithCompletion:(void(^)(VIContentInfo *info, NSError *error))completion;
 
-- (NSURLSessionDataTask *)downloadTaskWithDelegate:(id<MediaDownloaderDelegate>)delegate
-                                        fromOffset:(unsigned long long)fromOffset
-                                            length:(NSInteger)length;
-- (void)cancelTask:(NSURLSessionTask *)task;
+- (void)downloadTaskFromOffset:(unsigned long long)fromOffset
+                        length:(NSInteger)length
+                         toEnd:(BOOL)toEnd;
+
+- (void)cancel;
 - (void)invalidateAndCancel;
 
 @end

@@ -10,11 +10,11 @@
 #import "VIMediaDownloader.h"
 #import "VIContentInfo.h"
 @import AVFoundation;
+@import UIKit;
 
 @interface VIResourceLoadingRequestWorker () <MediaDownloaderDelegate>
 
 @property (nonatomic, strong, readwrite) AVAssetResourceLoadingRequest *request;
-@property (nonatomic, strong) NSURLSessionDataTask *task;
 @property (nonatomic, strong) VIMediaDownloader *mediaDownloader;
 
 @end
@@ -25,25 +25,37 @@
     self = [super init];
     if (self) {
         _mediaDownloader = mediaDownloader;
+        _mediaDownloader.delegate = self;
         _request = request;
-        AVAssetResourceLoadingDataRequest *dataRequest = request.dataRequest;
-        long long offset = dataRequest.currentOffset;
-        NSInteger length = dataRequest.requestedLength;
-        _task = [self.mediaDownloader downloadTaskWithDelegate:self fromOffset:offset length:length];
     }
     return self;
 }
 
 - (void)startWork {
-    [self.task resume];
+    AVAssetResourceLoadingDataRequest *dataRequest = self.request.dataRequest;
+    
+    long long offset = dataRequest.requestedOffset;
+    NSInteger length = dataRequest.requestedLength;
+    if (dataRequest.currentOffset != 0) {
+        offset = dataRequest.currentOffset;
+    }
+    
+    BOOL toEnd = NO;
+    if ([[UIDevice currentDevice].systemVersion floatValue] >= 9.0) {
+        if (dataRequest.requestsAllDataToEndOfResource) {
+            toEnd = YES;
+        }
+    }
+    NSLog(@"download, currentOffset: %@, requestedOffset: %@, requestedLength: %@, toEnd: %@", @(dataRequest.currentOffset), @(dataRequest.requestedOffset), @(dataRequest.requestedLength), @(toEnd));
+    [self.mediaDownloader downloadTaskFromOffset:offset length:length toEnd:toEnd];
 }
 
 - (void)cancel {
-    [self.task cancel];
+    [self.mediaDownloader cancel];
 }
 
 - (void)finish {
-    [self.mediaDownloader cancelTask:self.task];
+    [self.mediaDownloader cancel];
     if (!self.request.isFinished) {
         [self.request finishLoadingWithError:[self loaderCancelledError]];
     }
@@ -64,10 +76,12 @@
 
 - (void)mediaDownloader:(VIMediaDownloader *)downloader didFinishedWithError:(NSError *)error {
     if (error.code == NSURLErrorCancelled) {
-        NSLog(@"Cancel task %@", self.task.currentRequest.allHTTPHeaderFields[@"Range"]);
+        NSLog(@"Cancel dwonload %@", self.request.dataRequest);
         return;
     }
     
+    AVAssetResourceLoadingDataRequest *dataRequest = self.request.dataRequest;
+    NSLog(@"finish downloader, currentOffset: %@, requestedOffset: %@, requestedLength: %@", @(dataRequest.currentOffset), @(dataRequest.requestedOffset), @(dataRequest.requestedLength));
     if (!error) {
         [self.request finishLoading];
     } else {
