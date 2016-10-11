@@ -23,9 +23,7 @@
 - (NSArray<VICacheAction *> *)cachedDataActionsForRange:(NSRange)range;
 - (NSData *)cachedDataForRange:(NSRange)range;
 
-- (void)setCacheResponse:(NSURLResponse *)response;
-- (NSURLResponse *)cachedResponse;
-- (NSURLResponse *)cachedResponseForRequestRange:(NSRange)range;
+- (void)setContentInfo:(VIContentInfo *)contentInfo;
 
 - (void)save;
 

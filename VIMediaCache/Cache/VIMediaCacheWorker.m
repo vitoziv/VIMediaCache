@@ -214,33 +214,11 @@ static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
     return [actions copy];
 }
 
-- (void)setCacheResponse:(NSURLResponse *)response {
-    @synchronized (self.writeFileHandle) {
-        [self.internalCacheConfiguration updateResponse:response];
-        
-        [self.writeFileHandle truncateFileAtOffset:response.expectedContentLength];
-        [self.writeFileHandle synchronizeFile];
-    }
-}
-
-- (NSURLResponse *)cachedResponse {
-    return self.internalCacheConfiguration.response;
-}
-
-- (NSURLResponse *)cachedResponseForRequestRange:(NSRange)range {
-    NSHTTPURLResponse *response = (NSHTTPURLResponse *)[self cachedResponse];
-    if (![response isKindOfClass:[NSHTTPURLResponse class]]) {
-        return response;
-    }
+- (void)setContentInfo:(VIContentInfo *)contentInfo {
+    self.internalCacheConfiguration.contentInfo = contentInfo;
     
-    NSMutableDictionary *allHeaderFields = [response.allHeaderFields mutableCopy];
-    allHeaderFields[@"Content-Range"] = [NSString stringWithFormat:@"bytes %@-%@/%@", @(range.location), @(range.location + range.length - 1), @(response.expectedContentLength)];
-    response = [[NSHTTPURLResponse alloc] initWithURL:response.URL
-                                           statusCode:response.statusCode
-                                          HTTPVersion:@"HTTP/1.1"
-                                         headerFields:allHeaderFields];
-    
-    return response;
+    [self.writeFileHandle truncateFileAtOffset:contentInfo.contentLength];
+    [self.writeFileHandle synchronizeFile];
 }
 
 - (void)save {

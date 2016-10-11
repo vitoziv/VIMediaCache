@@ -7,14 +7,16 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "VIContentInfo.h"
 
 @interface VICacheConfiguration : NSObject <NSMutableCopying, NSCopying>
 
 + (instancetype)configurationWithFilePath:(NSString *)filePath;
 
 @property (nonatomic, copy, readonly) NSString *filePath;
+@property (nonatomic, strong) VIContentInfo *contentInfo;
+@property (nonatomic, strong) NSURL *url;
 
-@property (nonatomic, strong, readonly) NSURLResponse *response;
 - (NSArray<NSValue *> *)cacheFragments;
 
 /**
@@ -28,7 +30,6 @@
 
 @interface VIMutableCacheConfiguration : VICacheConfiguration
 
-- (void)updateResponse:(NSURLResponse *)response;
 - (void)save;
 - (void)addCacheFragment:(NSRange)fragment;
 

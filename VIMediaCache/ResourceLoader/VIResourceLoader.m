@@ -18,9 +18,7 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
 @property (nonatomic, strong) NSURL *url;
 @property (nonatomic, strong) VIMediaDownloader *mediaDownloader;
 @property (nonatomic, strong) NSMutableDictionary *pendingRequestWorkers;
-@property (nonatomic, strong) NSMutableArray<AVAssetResourceLoadingRequest *> *pendingRequests;
 
-@property (nonatomic, strong) VIContentInfo *info;
 @property (nonatomic, getter=isCancelled) BOOL cancelled;
 
 @end
@@ -38,9 +36,6 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
         _url = url;
         _mediaDownloader = [[VIMediaDownloader alloc] initWithURL:url];
         _pendingRequestWorkers = [NSMutableDictionary dictionary];
-        _pendingRequests = [NSMutableArray array];
-        
-        [self prepareForLoading];
     }
     return self;
 }
@@ -50,48 +45,13 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
     return nil;
 }
 
-- (void)prepareForLoading {
-    __weak typeof(self)weakSelf = self;
-    [self.mediaDownloader fetchFileInfoTaskWithCompletion:^(VIContentInfo *info, NSError *error) {
-        if (!error) {
-            weakSelf.info = info;
-            [weakSelf.pendingRequests enumerateObjectsUsingBlock:^(AVAssetResourceLoadingRequest * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-                [weakSelf addRequest:obj];
-            }];
-        } else {
-            weakSelf.cancelled = YES;
-            [weakSelf.pendingRequests enumerateObjectsUsingBlock:^(AVAssetResourceLoadingRequest * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-                [obj finishLoadingWithError:error];
-            }];
-        }
-        [weakSelf.pendingRequests removeAllObjects];
-    }];
-}
-
 - (void)addRequest:(AVAssetResourceLoadingRequest *)request {
     if (!self.isCancelled) {
-        if (!self.info) {
-            [self.pendingRequests addObject:request];
-            return;
-        }
-        
         [self.pendingRequestWorkers enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, VIResourceLoadingRequestWorker * _Nonnull obj, BOOL * _Nonnull stop) {
             NSLog(@"finish request worker: %@", obj);
             [obj finish];
         }];
         [self.pendingRequestWorkers removeAllObjects];
-        
-        // Fullfill content information
-        AVAssetResourceLoadingContentInformationRequest *contentInformationRequest = request.contentInformationRequest;
-        contentInformationRequest.byteRangeAccessSupported = self.info.byteRangeAccessSupported;
-        contentInformationRequest.contentType = self.info.contentType;
-        contentInformationRequest.contentLength = self.info.contentLength;
-        
-        NSString *key = [self keyForRequest:request];
-        VIResourceLoadingRequestWorker *pendingRequestWorker = self.pendingRequestWorkers[key];
-        if (pendingRequestWorker) {
-            [self removeRequest:pendingRequestWorker.request];
-        }
         
         [self startWorkerWithRequest:request];
     } else {

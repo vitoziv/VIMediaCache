@@ -9,6 +9,8 @@
 #import "VIResourceLoadingRequestWorker.h"
 #import "VIMediaDownloader.h"
 #import "VIContentInfo.h"
+
+@import MobileCoreServices;
 @import AVFoundation;
 @import UIKit;
 
@@ -27,6 +29,8 @@
         _mediaDownloader = mediaDownloader;
         _mediaDownloader.delegate = self;
         _request = request;
+        
+        [self fullfillContentInfo];
     }
     return self;
 }
@@ -68,7 +72,21 @@
     return error;
 }
 
+- (void)fullfillContentInfo {
+    AVAssetResourceLoadingContentInformationRequest *contentInformationRequest = self.request.contentInformationRequest;
+    if (self.mediaDownloader.info && !contentInformationRequest.contentType) {
+        // Fullfill content information
+        contentInformationRequest.contentType = self.mediaDownloader.info.contentType;
+        contentInformationRequest.contentLength = self.mediaDownloader.info.contentLength;
+        contentInformationRequest.byteRangeAccessSupported = self.mediaDownloader.info.byteRangeAccessSupported;
+    }
+}
+
 #pragma mark - MediaDownloaderDelegate
+
+- (void)mediaDownloader:(VIMediaDownloader *)downloader didReceiveResponse:(NSURLResponse *)response {
+    [self fullfillContentInfo];
+}
 
 - (void)mediaDownloader:(VIMediaDownloader *)downloader didReceiveData:(NSData *)data {
     [self.request.dataRequest respondWithData:data];

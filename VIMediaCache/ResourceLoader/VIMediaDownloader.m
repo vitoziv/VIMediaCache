@@ -179,9 +179,9 @@ didCompleteWithError:(nullable NSError *)error {
     [[NSNotificationCenter defaultCenter] postNotificationName:VICacheManagerDidUpdateCacheNotification
                                                         object:self
                                                       userInfo:@{
-                                                                 VICacheURLKey: configuration.response.URL ?: [NSNull null],
+                                                                 VICacheURLKey: configuration.url ?: [NSNull null],
                                                                  VICacheFragmentsKey: configuration.cacheFragments,
-                                                                 VICacheContentLengthKey: @(configuration.response.expectedContentLength)
+                                                                 VICacheContentLengthKey: @(configuration.contentInfo.contentLength)
                                                                  }];
 }
 
@@ -191,8 +191,18 @@ didCompleteWithError:(nullable NSError *)error {
           dataTask:(NSURLSessionDataTask *)dataTask
 didReceiveResponse:(NSURLResponse *)response
  completionHandler:(void (^)(NSURLSessionResponseDisposition disposition))completionHandler {
-    [self.cacheWorker startWritting];
-    completionHandler(NSURLSessionResponseAllow);
+    NSString *mimeType = response.MIMEType;
+    // Only download video/audio data
+    if ([mimeType rangeOfString:@"video/"].location == NSNotFound &&
+        [mimeType rangeOfString:@"audio/"].location == NSNotFound) {
+        completionHandler(NSURLSessionResponseCancel);
+    } else {
+        if ([self.delegate respondsToSelector:@selector(actionWorker:didReceiveResponse:)]) {
+            [self.delegate actionWorker:self didReceiveResponse:response];
+        }
+        [self.cacheWorker startWritting];
+        completionHandler(NSURLSessionResponseAllow);
+    }
 }
 
 - (void)URLSession:(NSURLSession *)session
@@ -255,6 +265,7 @@ didCompleteWithError:(nullable NSError *)error {
         
         NSString *filePath = [VICacheManager cachedFilePathForURL:url];
         _cacheWorker = [VIMediaCacheWorker inMemoryCacheWorkerWithFilePath:filePath];
+        _info = _cacheWorker.cacheConfiguration.contentInfo;
     }
     return self;
 }
@@ -267,61 +278,13 @@ didCompleteWithError:(nullable NSError *)error {
     return _session;
 }
 
-- (void)fetchFileInfoTaskWithCompletion:(void(^)(VIContentInfo *info, NSError *error))completion {
-    
-    void(^completionBlock)(NSHTTPURLResponse *response, NSError *error) = ^(NSHTTPURLResponse *response, NSError *error){
-        if (!error) {
-            [self.cacheWorker setCacheResponse:response];
-            VIContentInfo *info = [VIContentInfo new];
-            
-            if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
-                NSHTTPURLResponse *HTTPURLResponse = (NSHTTPURLResponse *)response;
-                NSString *acceptRange = HTTPURLResponse.allHeaderFields[@"Accept-Ranges"];
-                info.byteRangeAccessSupported = [acceptRange isEqualToString:@"bytes"];
-            }
-            info.contentLength = response.expectedContentLength;
-            NSString *mimeType = response.MIMEType;
-            CFStringRef contentType = UTTypeCreatePreferredIdentifierForTag(kUTTagClassMIMEType, (__bridge CFStringRef)(mimeType), NULL);
-            info.contentType = CFBridgingRelease(contentType);
-            completion(info, nil);
-        } else {
-            completion(nil, error);
-        }
-    };
-    
-    NSURLResponse *response = self.cacheWorker.cachedResponse;
-    if (response && [response isKindOfClass:[NSHTTPURLResponse class]]) {
-        completionBlock((NSHTTPURLResponse *)response, nil);
-    } else {
-        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:self.url];
-        request.HTTPMethod = @"HEAD";
-        
-        NSURLSessionDataTask *task = [self.session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-            if (!error) {
-                NSString *mimeType = response.MIMEType;
-                // Only download video/audio data
-                // TODO: support HLS, RTMP
-                if ([mimeType rangeOfString:@"video/"].location == NSNotFound &&
-                    [mimeType rangeOfString:@"audio/"].location == NSNotFound) {
-                    error = [NSError errorWithDomain:@"com.vimediacache.download" code:1 userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(@"Do not support the format", nil)}];
-                }
-            }
-            
-            completionBlock((NSHTTPURLResponse *)response, error);
-        }];
-        
-        self.task = task;
-        [task resume];
-    }
-}
-
 - (void)downloadTaskFromOffset:(unsigned long long)fromOffset
                         length:(NSInteger)length
                          toEnd:(BOOL)toEnd {
     NSRange range = NSMakeRange(fromOffset, length);
     
     if (toEnd) {
-        range.length = self.cacheWorker.cachedResponse.expectedContentLength - range.location;
+        range.length = self.cacheWorker.cacheConfiguration.contentInfo.contentLength - range.location;
     }
     
     NSLog(@"request range: %@", NSStringFromRange(range));
@@ -349,7 +312,27 @@ didCompleteWithError:(nullable NSError *)error {
 #pragma mark - VIActionWorkerDelegate
 
 - (void)actionWorker:(VIActionWorker *)actionWorker didReceiveResponse:(NSURLResponse *)response {
+    if (!self.info) {
+        VIContentInfo *info = [VIContentInfo new];
+        
+        if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
+            NSHTTPURLResponse *HTTPURLResponse = (NSHTTPURLResponse *)response;
+            NSString *acceptRange = HTTPURLResponse.allHeaderFields[@"Accept-Ranges"];
+            info.byteRangeAccessSupported = [acceptRange isEqualToString:@"bytes"];
+            info.contentLength = [[[HTTPURLResponse.allHeaderFields[@"Content-Range"] componentsSeparatedByString:@"/"] lastObject] longLongValue];
+        }
+        NSString *mimeType = response.MIMEType;
+        CFStringRef contentType = UTTypeCreatePreferredIdentifierForTag(kUTTagClassMIMEType, (__bridge CFStringRef)(mimeType), NULL);
+        info.contentType = CFBridgingRelease(contentType);
+        self.info = info;
+        
+        [self.cacheWorker setContentInfo:info];
+        self.cacheWorker.cacheConfiguration.url = response.URL;
+    }
     
+    if ([self.delegate respondsToSelector:@selector(mediaDownloader:didReceiveResponse:)]) {
+        [self.delegate mediaDownloader:self didReceiveResponse:response];
+    }
 }
 
 - (void)actionWorker:(VIActionWorker *)actionWorker didReceiveData:(NSData *)data isLocal:(BOOL)isLocal {

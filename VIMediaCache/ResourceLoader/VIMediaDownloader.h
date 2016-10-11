@@ -16,8 +16,7 @@
 - (instancetype)initWithURL:(NSURL *)url;
 @property (nonatomic, strong, readonly) NSURL *url;
 @property (nonatomic, weak) id<MediaDownloaderDelegate> delegate;
-
-- (void)fetchFileInfoTaskWithCompletion:(void(^)(VIContentInfo *info, NSError *error))completion;
+@property (nonatomic, strong) VIContentInfo *info;
 
 - (void)downloadTaskFromOffset:(unsigned long long)fromOffset
                         length:(NSInteger)length
@@ -31,6 +30,7 @@
 @protocol MediaDownloaderDelegate <NSObject>
 
 @optional
+- (void)mediaDownloader:(VIMediaDownloader *)downloader didReceiveResponse:(NSURLResponse *)response;
 - (void)mediaDownloader:(VIMediaDownloader *)downloader didReceiveData:(NSData *)data;
 - (void)mediaDownloader:(VIMediaDownloader *)downloader didFinishedWithError:(NSError *)error;
 

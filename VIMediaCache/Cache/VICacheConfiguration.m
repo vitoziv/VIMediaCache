@@ -10,12 +10,12 @@
 
 static NSString *kFileNameKey = @"kFileNameKey";
 static NSString *kCacheFragmentsKey = @"kCacheFragmentsKey";
-static NSString *kResponseKey = @"kResponseKey";
 static NSString *kDownloadInfoKey = @"kDownloadInfoKey";
+static NSString *kContentInfoKey = @"kContentInfoKey";
+static NSString *kURLKey = @"kURLKey";
 
 @interface VICacheConfiguration () <NSCoding>
 
-@property (nonatomic, strong) NSURLResponse *response;
 @property (nonatomic, copy) NSString *filePath;
 @property (nonatomic, copy) NSString *fileName;
 @property (nonatomic, copy) NSArray<NSValue *> *internalCacheFragments;
@@ -57,7 +57,7 @@ static NSString *kDownloadInfoKey = @"kDownloadInfoKey";
 }
 
 - (float)progress {
-    float progress = self.downloadedBytes / (float)self.response.expectedContentLength;
+    float progress = self.downloadedBytes / (float)self.contentInfo.contentLength;
     return progress;
 }
 
@@ -88,8 +88,9 @@ static NSString *kDownloadInfoKey = @"kDownloadInfoKey";
 - (void)encodeWithCoder:(NSCoder *)aCoder {
     [aCoder encodeObject:self.fileName forKey:kFileNameKey];
     [aCoder encodeObject:self.internalCacheFragments forKey:kCacheFragmentsKey];
-    [aCoder encodeObject:self.response forKey:kResponseKey];
     [aCoder encodeObject:self.downloadInfo forKey:kDownloadInfoKey];
+    [aCoder encodeObject:self.contentInfo forKey:kContentInfoKey];
+    [aCoder encodeObject:self.url forKey:kURLKey];
 }
 
 - (nullable instancetype)initWithCoder:(NSCoder *)aDecoder {
@@ -100,8 +101,9 @@ static NSString *kDownloadInfoKey = @"kDownloadInfoKey";
         if (!_internalCacheFragments) {
             _internalCacheFragments = [NSArray array];
         }
-        _response = [aDecoder decodeObjectForKey:kResponseKey];
         _downloadInfo = [aDecoder decodeObjectForKey:kDownloadInfoKey];
+        _contentInfo = [aDecoder decodeObjectForKey:kContentInfoKey];
+        _url = [aDecoder decodeObjectForKey:kURLKey];
     }
     return self;
 }
@@ -113,8 +115,9 @@ static NSString *kDownloadInfoKey = @"kDownloadInfoKey";
     configuration.fileName = self.fileName;
     configuration.filePath = self.filePath;
     configuration.internalCacheFragments = self.internalCacheFragments;
-    configuration.response = [self.response copy];
     configuration.downloadInfo = self.downloadInfo;
+    configuration.url = self.url;
+    configuration.contentInfo = self.contentInfo;
     
     return configuration;
 }
@@ -126,8 +129,9 @@ static NSString *kDownloadInfoKey = @"kDownloadInfoKey";
     configuration.fileName = self.fileName;
     configuration.filePath = self.filePath;
     configuration.internalCacheFragments = self.internalCacheFragments;
-    configuration.response = [self.response copy];
     configuration.downloadInfo = self.downloadInfo;
+    configuration.url = self.url;
+    configuration.contentInfo = self.contentInfo;
     
     return configuration;
 }
@@ -138,10 +142,6 @@ static NSString *kDownloadInfoKey = @"kDownloadInfoKey";
 
 + (instancetype)configurationWithFilePath:(NSString *)filePath {
     return [[super configurationWithFilePath:filePath] mutableCopy];
-}
-
-- (void)updateResponse:(NSURLResponse *)response {
-    self.response = response;
 }
 
 - (void)save {

@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface VIContentInfo : NSObject
+@interface VIContentInfo : NSObject <NSCoding>
 
 @property (nonatomic, copy) NSString *contentType;
 @property (nonatomic, assign) BOOL byteRangeAccessSupported;
