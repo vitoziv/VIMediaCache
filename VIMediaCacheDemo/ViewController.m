@@ -65,10 +65,10 @@
 #pragma mark - Setup
 
 - (void)setupPlayer {
-//        NSURL *url = [NSURL URLWithString:@"https://mvvideo5.meitudata.com/56ea0e90d6cb2653.mp4"];
+        NSURL *url = [NSURL URLWithString:@"https://mvvideo5.meitudata.com/56ea0e90d6cb2653.mp4"];
 //        NSURL *url = [NSURL URLWithString:@"https://mvvideo5.meitudata.com/56a9e1389b9706520.mp4"];
 //        NSURL *url = [NSURL URLWithString:@"http://media-test.1iptv.com/recordings/z1.meipai-live-test.57d15a1f1013858cda04d060/z157d15a1f1013858cda04d060.m3u8?start=-1&end=-1"];
-    NSURL *url = [NSURL URLWithString:@"https://mvvideo5.meitudata.com/571090934cea5517.mp4"];
+//    NSURL *url = [NSURL URLWithString:@"http://nightwander.s.qupai.me/v/7f7aa378-b80e-44e8-a326-32b19614218f.mp4?token=AMIRnTPJEMn9iZslnQZp3bKNGNtBnSC10MYJDIyMDNyAyMkNGOwQmNkJGO3AjYwIDIyACNzIDMyczM4QTM"];
     //    NSURL *url = [NSURL URLWithString:@"http://data.5sing.kgimg.com/G061/M0A/03/13/HZQEAFb493iAOeg5AHMiAfzZU0E739.mp3"];
     
     VIResourceLoaderManager *resourceLoaderManager = [VIResourceLoaderManager new];
