@@ -23,4 +23,15 @@ extern NSString *VICacheContentLengthKey;
 + (NSString *)cachedFilePathForURL:(NSURL *)url;
 + (VICacheConfiguration *)cacheConfigurationForURL:(NSURL *)url;
 
+
+/**
+ Calculate cached files size
+
+ @param error
+ @return files size, respresent by `byte`, if error occured return -1
+ */
++ (unsigned long long)calculateCachedSizeWithError:(NSError **)error;
++ (void)cleanAllCacheWithError:(NSError **)error;
++ (void)cleanCacheForURL:(NSURL *)url error:(NSError **)error;
+
 @end

@@ -26,7 +26,7 @@ static NSString *kURLKey = @"kURLKey";
 @implementation VICacheConfiguration
 
 + (instancetype)configurationWithFilePath:(NSString *)filePath {
-    filePath = [filePath stringByAppendingPathExtension:@"mt_cfg"];
+    filePath = [self configurationFilePathForFilePath:filePath];
     VICacheConfiguration *configuration = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
     
     if (!configuration) {
@@ -36,6 +36,10 @@ static NSString *kURLKey = @"kURLKey";
     configuration.filePath = filePath;
     
     return [configuration copy];
+}
+
++ (NSString *)configurationFilePathForFilePath:(NSString *)filePath {
+    return [filePath stringByAppendingPathExtension:@"mt_cfg"];
 }
 
 - (NSArray<NSValue *> *)internalCacheFragments {

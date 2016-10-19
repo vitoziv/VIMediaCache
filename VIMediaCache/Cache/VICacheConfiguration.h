@@ -11,6 +11,8 @@
 
 @interface VICacheConfiguration : NSObject <NSMutableCopying, NSCopying>
 
++ (NSString *)configurationFilePathForFilePath:(NSString *)filePath;
+
 + (instancetype)configurationWithFilePath:(NSString *)filePath;
 
 @property (nonatomic, copy, readonly) NSString *filePath;

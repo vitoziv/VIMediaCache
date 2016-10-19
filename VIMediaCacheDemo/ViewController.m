@@ -36,6 +36,11 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    unsigned long long fileSize = [VICacheManager calculateCachedSizeWithError:nil];
+    NSLog(@"file cache size: %@", @(fileSize));
+    [VICacheManager cleanAllCacheWithError:nil];
+    
     [self setupPlayer];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(mediaCacheDidChanged:) name:VICacheManagerDidUpdateCacheNotification object:nil];
