@@ -119,7 +119,9 @@ didCompleteWithError:(nullable NSError *)error {
 }
 
 - (void)cancel {
-    [self.session invalidateAndCancel];
+    if (_session) {
+        [self.session invalidateAndCancel];
+    }
     self.cancelled = YES;
 }
 
@@ -253,6 +255,7 @@ didCompleteWithError:(nullable NSError *)error {
 @property (nonatomic, strong) VIMediaCacheWorker *cacheWorker;
 @property (nonatomic, strong) VIActionWorker *actionWorker;
 
+@property (nonatomic) BOOL downloadToEnd;
 
 @end
 
@@ -289,9 +292,17 @@ didCompleteWithError:(nullable NSError *)error {
     
     NSLog(@"request range: %@", NSStringFromRange(range));
     NSArray *actions = [self.cacheWorker cachedDataActionsForRange:range];
-    if (self.actionWorker) {
-        NSLog(@"can not happen");
-    }
+
+    self.actionWorker = [[VIActionWorker alloc] initWithActions:actions url:self.url];
+    self.actionWorker.delegate = self;
+    [self.actionWorker start];
+}
+
+- (void)downloadFromStartToEnd {
+    self.downloadToEnd = YES;
+    NSRange range = NSMakeRange(0, 2);
+    NSArray *actions = [self.cacheWorker cachedDataActionsForRange:range];
+
     self.actionWorker = [[VIActionWorker alloc] initWithActions:actions url:self.url];
     self.actionWorker.delegate = self;
     [self.actionWorker start];
@@ -345,7 +356,11 @@ didCompleteWithError:(nullable NSError *)error {
     if ([self.delegate respondsToSelector:@selector(mediaDownloader:didFinishedWithError:)]) {
         [self.delegate mediaDownloader:self didFinishedWithError:error];
     }
+    
+    if (!error && self.downloadToEnd) {
+        self.downloadToEnd = NO;
+        [self downloadTaskFromOffset:2 length:self.cacheWorker.cacheConfiguration.contentInfo.contentLength - 2 toEnd:YES];
+    }
 }
-
 
 @end

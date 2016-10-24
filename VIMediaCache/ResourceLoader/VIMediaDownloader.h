@@ -21,6 +21,7 @@
 - (void)downloadTaskFromOffset:(unsigned long long)fromOffset
                         length:(NSInteger)length
                          toEnd:(BOOL)toEnd;
+- (void)downloadFromStartToEnd;
 
 - (void)cancel;
 - (void)invalidateAndCancel;
