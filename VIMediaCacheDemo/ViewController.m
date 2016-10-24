@@ -23,6 +23,8 @@
 @property (weak, nonatomic) IBOutlet UILabel *totalTimeLabel;
 @property (weak, nonatomic) IBOutlet UILabel *currentTimeLabel;
 
+@property (nonatomic, strong) VIMediaDownloader *downloader;
+
 @end
 
 @implementation ViewController
@@ -39,7 +41,19 @@
     
     unsigned long long fileSize = [VICacheManager calculateCachedSizeWithError:nil];
     NSLog(@"file cache size: %@", @(fileSize));
-    [VICacheManager cleanAllCacheWithError:nil];
+    NSError *error;
+    [VICacheManager cleanAllCacheWithError:&error];
+    if (error) {
+        NSLog(@"clean cache failure: %@", error);
+    }
+    
+    [VICacheManager cleanAllCacheWithError:&error];
+    
+    
+//    NSURL *url = [NSURL URLWithString:@"https://mvvideo5.meitudata.com/56ea0e90d6cb2653.mp4"];
+//    VIMediaDownloader *downloader = [[VIMediaDownloader alloc] initWithURL:url];
+//    [downloader downloadFromStartToEnd];
+//    self.downloader = downloader;
     
     [self setupPlayer];
     
