@@ -13,7 +13,6 @@
 
 @interface VIMediaCacheWorker : NSObject
 
-+ (instancetype)inMemoryCacheWorkerWithFilePath:(NSString *)filePath;
 - (instancetype)initWithCacheFilePath:(NSString *)path;
 
 @property (nonatomic, strong, readonly) VICacheConfiguration *cacheConfiguration;

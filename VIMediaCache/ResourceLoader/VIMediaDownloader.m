@@ -15,6 +15,8 @@
 #import "VICacheManager.h"
 #import "VICacheAction.h"
 
+#pragma mark - Class: VIURLSessionDelegateObject
+
 @protocol  VIURLSessionDelegateObjectDelegate <NSObject>
 
 - (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSessionResponseDisposition disposition))completionHandler;
@@ -64,6 +66,9 @@ didCompleteWithError:(nullable NSError *)error {
 
 @end
 
+
+#pragma mark - Class: VIActionWorker
+
 @class VIActionWorker;
 
 @protocol VIActionWorkerDelegate <NSObject>
@@ -77,7 +82,7 @@ didCompleteWithError:(nullable NSError *)error {
 @interface VIActionWorker : NSObject <VIURLSessionDelegateObjectDelegate>
 
 @property (nonatomic, strong) NSMutableArray<VICacheAction *> *actions;
-- (instancetype)initWithActions:(NSArray<VICacheAction *> *)actions url:(NSURL *)url;
+- (instancetype)initWithActions:(NSArray<VICacheAction *> *)actions url:(NSURL *)url cacheWorker:(VIMediaCacheWorker *)cacheWorker;
 
 @property (nonatomic, weak) id<VIActionWorkerDelegate> delegate;
 
@@ -103,12 +108,11 @@ didCompleteWithError:(nullable NSError *)error {
     [self cancel];
 }
 
-- (instancetype)initWithActions:(NSArray<VICacheAction *> *)actions url:(NSURL *)url{
+- (instancetype)initWithActions:(NSArray<VICacheAction *> *)actions url:(NSURL *)url cacheWorker:(VIMediaCacheWorker *)cacheWorker {
     self = [super init];
     if (self) {
         _actions = [actions mutableCopy];
-        NSString *filePath = [VICacheManager cachedFilePathForURL:url];
-        _cacheWorker = [VIMediaCacheWorker inMemoryCacheWorkerWithFilePath:filePath];
+        _cacheWorker = cacheWorker;
         _url = url;
     }
     return self;
@@ -246,6 +250,60 @@ didCompleteWithError:(nullable NSError *)error {
 
 @end
 
+#pragma mark - Class: VIMediaDownloaderStatus
+
+
+@interface VIMediaDownloaderStatus ()
+
+@property (nonatomic, strong) NSMutableSet *downloadingURLS;
+
+@end
+
+@implementation VIMediaDownloaderStatus
+
++ (instancetype)shared {
+    static VIMediaDownloaderStatus *instance = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        instance = [[self alloc] init];
+        instance.downloadingURLS = [NSMutableSet set];
+    });
+    
+    return instance;
+}
+
+- (void)addURL:(NSURL *)url {
+    NSLog(@"%@ 1", NSStringFromSelector(_cmd));
+    @synchronized (self.downloadingURLS) {
+        NSLog(@"%@ 2", NSStringFromSelector(_cmd));
+        [self.downloadingURLS addObject:url];
+    }
+}
+
+- (void)removeURL:(NSURL *)url {
+    NSLog(@"%@ 1", NSStringFromSelector(_cmd));
+    @synchronized (self.downloadingURLS) {
+        NSLog(@"%@ 2", NSStringFromSelector(_cmd));
+        [self.downloadingURLS removeObject:url];
+    }
+}
+
+- (BOOL)containsURL:(NSURL *)url {
+    NSLog(@"%@ 1", NSStringFromSelector(_cmd));
+    @synchronized (self.downloadingURLS) {
+        NSLog(@"%@ 2", NSStringFromSelector(_cmd));
+        return [self.downloadingURLS containsObject:url];
+    }
+}
+
+- (NSSet *)urls {
+    return [self.downloadingURLS copy];
+}
+
+@end
+
+#pragma mark - Class: VIMediaDownloader
+
 @interface VIMediaDownloader () <VIActionWorkerDelegate>
 
 @property (nonatomic, strong) NSURL *url;
@@ -261,13 +319,17 @@ didCompleteWithError:(nullable NSError *)error {
 
 @implementation VIMediaDownloader
 
+- (void)dealloc {
+    [[VIMediaDownloaderStatus shared] removeURL:self.url];
+}
+
 - (instancetype)initWithURL:(NSURL *)url {
     self = [super init];
     if (self) {
         _url = url;
         
         NSString *filePath = [VICacheManager cachedFilePathForURL:url];
-        _cacheWorker = [VIMediaCacheWorker inMemoryCacheWorkerWithFilePath:filePath];
+        _cacheWorker = [[VIMediaCacheWorker alloc] initWithCacheFilePath:filePath];
         _info = _cacheWorker.cacheConfiguration.contentInfo;
     }
     return self;
@@ -284,6 +346,13 @@ didCompleteWithError:(nullable NSError *)error {
 - (void)downloadTaskFromOffset:(unsigned long long)fromOffset
                         length:(NSInteger)length
                          toEnd:(BOOL)toEnd {
+    if ([self isCurrentURLDownloading]) {
+        [self handleCurrentURLDownloadingError];
+        return;
+    }
+    [[VIMediaDownloaderStatus shared] addURL:self.url];
+    
+    // ---
     NSRange range = NSMakeRange(fromOffset, length);
     
     if (toEnd) {
@@ -293,31 +362,54 @@ didCompleteWithError:(nullable NSError *)error {
     NSLog(@"request range: %@", NSStringFromRange(range));
     NSArray *actions = [self.cacheWorker cachedDataActionsForRange:range];
 
-    self.actionWorker = [[VIActionWorker alloc] initWithActions:actions url:self.url];
+    self.actionWorker = [[VIActionWorker alloc] initWithActions:actions url:self.url cacheWorker:self.cacheWorker];
     self.actionWorker.delegate = self;
     [self.actionWorker start];
 }
 
 - (void)downloadFromStartToEnd {
+    if ([self isCurrentURLDownloading]) {
+        [self handleCurrentURLDownloadingError];
+        return;
+    }
+    [[VIMediaDownloaderStatus shared] addURL:self.url];
+    
+    // ---
     self.downloadToEnd = YES;
     NSRange range = NSMakeRange(0, 2);
     NSArray *actions = [self.cacheWorker cachedDataActionsForRange:range];
 
-    self.actionWorker = [[VIActionWorker alloc] initWithActions:actions url:self.url];
+    self.actionWorker = [[VIActionWorker alloc] initWithActions:actions url:self.url cacheWorker:self.cacheWorker];
     self.actionWorker.delegate = self;
     [self.actionWorker start];
 }
 
 - (void)cancel {
+    [[VIMediaDownloaderStatus shared] removeURL:self.url];
     self.actionWorker.delegate = nil;
     [self.actionWorker cancel];
     self.actionWorker = nil;
 }
 
 - (void)invalidateAndCancel {
+    [[VIMediaDownloaderStatus shared] removeURL:self.url];
     self.actionWorker.delegate = nil;
     [self.actionWorker cancel];
     self.actionWorker = nil;
+}
+
+#pragma mark - Union check
+
+- (BOOL)isCurrentURLDownloading {
+    return [[VIMediaDownloaderStatus shared] containsURL:self.url];
+}
+
+- (void)handleCurrentURLDownloadingError {
+    if (self.delegate) {
+        NSString *description = [NSString stringWithFormat:NSLocalizedString(@"URL: `%@` alreay in downloading queue.", nil), self.url];
+        NSError *error = [NSError errorWithDomain:@"com.meidadownload" code:1 userInfo:@{NSLocalizedDescriptionKey: description}];
+        [self.delegate mediaDownloader:self didFinishedWithError:error];
+    }
 }
 
 #pragma mark - VIActionWorkerDelegate
@@ -353,6 +445,8 @@ didCompleteWithError:(nullable NSError *)error {
 }
 
 - (void)actionWorker:(VIActionWorker *)actionWorker didFinishWithError:(NSError *)error {
+    [[VIMediaDownloaderStatus shared] removeURL:self.url];
+    
     if ([self.delegate respondsToSelector:@selector(mediaDownloader:didFinishedWithError:)]) {
         [self.delegate mediaDownloader:self didFinishedWithError:error];
     }

@@ -10,42 +10,7 @@
 #import "VICacheAction.h"
 
 static NSInteger const kPackageLength = 204800; // 200kb per package
-
-@interface VIMediaCacheWorkerFactory : NSObject
-
-@property (nonatomic, strong) NSMutableDictionary *memoryCacheWorkers;
-
-@end
-
-@implementation VIMediaCacheWorkerFactory
-
-+ (instancetype)shared {
-    static VIMediaCacheWorkerFactory *instance = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        instance = [[self alloc] init];
-        instance.memoryCacheWorkers = [NSMutableDictionary dictionary];
-    });
-    
-    return instance;
-}
-
-- (VIMediaCacheWorker *)cacheWorkerWithFilePath:(NSString *)filePath {
-    VIMediaCacheWorker *cacheWorker = self.memoryCacheWorkers[filePath];
-    if (!cacheWorker) {
-        cacheWorker = [[VIMediaCacheWorker alloc] initWithCacheFilePath:filePath];
-        if (filePath) {
-            self.memoryCacheWorkers[filePath] = cacheWorker;
-        }
-    }
-    
-    return cacheWorker;
-}
-
-@end
-
 static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
-
 
 @interface VIMediaCacheWorker ()
 
@@ -68,10 +33,6 @@ static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
 - (void)dealloc {
     [_readFileHandle closeFile];
     [_writeFileHandle closeFile];
-}
-
-+ (instancetype)inMemoryCacheWorkerWithFilePath:(NSString *)filePath {
-    return [[VIMediaCacheWorkerFactory shared] cacheWorkerWithFilePath:filePath];
 }
 
 - (instancetype)initWithCacheFilePath:(NSString *)path {

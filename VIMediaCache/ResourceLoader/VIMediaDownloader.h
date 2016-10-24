@@ -11,6 +11,18 @@
 @protocol MediaDownloaderDelegate;
 @class VIContentInfo;
 
+@interface VIMediaDownloaderStatus : NSObject
+
++ (instancetype)shared;
+
+/**
+ return YES if downloading the url source
+ */
+- (BOOL)containsURL:(NSURL *)url;
+- (NSSet *)urls;
+
+@end
+
 @interface VIMediaDownloader : NSObject
 
 - (instancetype)initWithURL:(NSURL *)url;
