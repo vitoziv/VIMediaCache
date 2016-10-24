@@ -273,25 +273,19 @@ didCompleteWithError:(nullable NSError *)error {
 }
 
 - (void)addURL:(NSURL *)url {
-    NSLog(@"%@ 1", NSStringFromSelector(_cmd));
     @synchronized (self.downloadingURLS) {
-        NSLog(@"%@ 2", NSStringFromSelector(_cmd));
         [self.downloadingURLS addObject:url];
     }
 }
 
 - (void)removeURL:(NSURL *)url {
-    NSLog(@"%@ 1", NSStringFromSelector(_cmd));
     @synchronized (self.downloadingURLS) {
-        NSLog(@"%@ 2", NSStringFromSelector(_cmd));
         [self.downloadingURLS removeObject:url];
     }
 }
 
 - (BOOL)containsURL:(NSURL *)url {
-    NSLog(@"%@ 1", NSStringFromSelector(_cmd));
     @synchronized (self.downloadingURLS) {
-        NSLog(@"%@ 2", NSStringFromSelector(_cmd));
         return [self.downloadingURLS containsObject:url];
     }
 }
