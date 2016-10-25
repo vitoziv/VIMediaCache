@@ -16,6 +16,7 @@ NSString *VICacheFragmentsKey = @"VICacheFragmentsKey";
 NSString *VICacheContentLengthKey = @"VICacheContentLengthKey";
 
 static NSString *kMCMediaCacheDirectory;
+static NSTimeInterval kMCMediaCacheNotifyInterval;
 
 @implementation VICacheManager
 
@@ -23,6 +24,7 @@ static NSString *kMCMediaCacheDirectory;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         [self setCacheDirectory:[NSTemporaryDirectory() stringByAppendingPathComponent:@"vimedia"]];
+        [self setCacheUpdateNotifyInterval:0.1];
     });
 }
 
@@ -32,6 +34,14 @@ static NSString *kMCMediaCacheDirectory;
 
 + (NSString *)cacheDirectory {
     return kMCMediaCacheDirectory;
+}
+
++ (void)setCacheUpdateNotifyInterval:(NSTimeInterval)interval {
+    kMCMediaCacheNotifyInterval = interval;
+}
+
++ (NSTimeInterval)cacheUpdateNotifyInterval {
+    return kMCMediaCacheNotifyInterval;
 }
 
 + (NSString *)cachedFilePathForURL:(NSURL *)url {

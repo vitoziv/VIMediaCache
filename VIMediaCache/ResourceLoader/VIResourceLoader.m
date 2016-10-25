@@ -78,7 +78,6 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
 #pragma mark - VIResourceLoadingRequestWorkerDelegate
 
 - (void)resourceLoadingRequestWorkerDidComplete:(VIResourceLoadingRequestWorker *)requestWorker {
-    NSLog(@"%@, %@", self, NSStringFromSelector(_cmd));
     [self removeRequest:requestWorker.request];
     
     // Start previous cancelled request
@@ -94,7 +93,6 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
 #pragma mark - Helper
 
 - (void)startWorkerWithRequest:(AVAssetResourceLoadingRequest *)request {
-    NSLog(@"%@, %@", self, NSStringFromSelector(_cmd));
     NSString *key = [self keyForRequest:request];
     VIResourceLoadingRequestWorker *requestWorker = [[VIResourceLoadingRequestWorker alloc] initWithMediaDownloader:self.mediaDownloader
                                                                                              resourceLoadingRequest:request];

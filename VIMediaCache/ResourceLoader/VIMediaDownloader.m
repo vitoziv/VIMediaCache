@@ -102,6 +102,12 @@ didCompleteWithError:(nullable NSError *)error {
 
 @end
 
+@interface VIActionWorker ()
+
+@property (nonatomic) NSTimeInterval notifyTime;
+
+@end
+
 @implementation VIActionWorker
 
 - (void)dealloc {
@@ -156,7 +162,7 @@ didCompleteWithError:(nullable NSError *)error {
         if ([self.delegate respondsToSelector:@selector(actionWorker:didFinishWithError:)]) {
             [self.delegate actionWorker:self didFinishWithError:nil];
         }
-        [self notifyDownloadProgress];
+        [self notifyDownloadProgressWithFlush:YES];
         return;
     }
     [self.actions removeObjectAtIndex:0];
@@ -180,15 +186,20 @@ didCompleteWithError:(nullable NSError *)error {
     }
 }
 
-- (void)notifyDownloadProgress {
-    VICacheConfiguration *configuration = self.cacheWorker.cacheConfiguration;
-    [[NSNotificationCenter defaultCenter] postNotificationName:VICacheManagerDidUpdateCacheNotification
-                                                        object:self
-                                                      userInfo:@{
-                                                                 VICacheURLKey: configuration.url ?: [NSNull null],
-                                                                 VICacheFragmentsKey: configuration.cacheFragments,
-                                                                 VICacheContentLengthKey: @(configuration.contentInfo.contentLength)
-                                                                 }];
+- (void)notifyDownloadProgressWithFlush:(BOOL)flush {
+    double currentTime = CFAbsoluteTimeGetCurrent();
+    double interval = [VICacheManager cacheUpdateNotifyInterval];
+    if ((self.notifyTime < currentTime - interval) || flush) {
+        self.notifyTime = currentTime;
+        VICacheConfiguration *configuration = self.cacheWorker.cacheConfiguration;
+        [[NSNotificationCenter defaultCenter] postNotificationName:VICacheManagerDidUpdateCacheNotification
+                                                            object:self
+                                                          userInfo:@{
+                                                                     VICacheURLKey: configuration.url ?: [NSNull null],
+                                                                     VICacheFragmentsKey: configuration.cacheFragments,
+                                                                     VICacheContentLengthKey: @(configuration.contentInfo.contentLength)
+                                                                     }];
+    }
 }
 
 #pragma mark - VIURLSessionDelegateObjectDelegate
@@ -226,7 +237,7 @@ didReceiveResponse:(NSURLResponse *)response
         [self.delegate actionWorker:self didReceiveData:data isLocal:NO];
     }
     
-    [self notifyDownloadProgress];
+    [self notifyDownloadProgressWithFlush:NO];
 }
 
 - (void)URLSession:(NSURLSession *)session
@@ -347,13 +358,12 @@ didCompleteWithError:(nullable NSError *)error {
     [[VIMediaDownloaderStatus shared] addURL:self.url];
     
     // ---
-    NSRange range = NSMakeRange(fromOffset, length);
+    NSRange range = NSMakeRange((NSUInteger)fromOffset, length);
     
     if (toEnd) {
-        range.length = self.cacheWorker.cacheConfiguration.contentInfo.contentLength - range.location;
+        range.length = (NSInteger)self.cacheWorker.cacheConfiguration.contentInfo.contentLength - range.location;
     }
     
-    NSLog(@"request range: %@", NSStringFromRange(range));
     NSArray *actions = [self.cacheWorker cachedDataActionsForRange:range];
 
     self.actionWorker = [[VIActionWorker alloc] initWithActions:actions url:self.url cacheWorker:self.cacheWorker];

@@ -50,7 +50,6 @@
             toEnd = YES;
         }
     }
-    NSLog(@"download, currentOffset: %@, requestedOffset: %@, requestedLength: %@, toEnd: %@", @(dataRequest.currentOffset), @(dataRequest.requestedOffset), @(dataRequest.requestedLength), @(toEnd));
     [self.mediaDownloader downloadTaskFromOffset:offset length:length toEnd:toEnd];
 }
 

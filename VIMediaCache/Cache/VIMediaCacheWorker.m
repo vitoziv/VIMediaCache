@@ -9,6 +9,8 @@
 #import "VIMediaCacheWorker.h"
 #import "VICacheAction.h"
 
+@import UIKit;
+
 static NSInteger const kPackageLength = 204800; // 200kb per package
 static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
 
@@ -31,6 +33,8 @@ static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
 @implementation VIMediaCacheWorker
 
 - (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [self save];
     [_readFileHandle closeFile];
     [_writeFileHandle closeFile];
 }
@@ -77,7 +81,6 @@ static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
             [self.writeFileHandle writeData:data];
             self.writeBytes += data.length;
             [self.internalCacheConfiguration addCacheFragment:range];
-            [self save];
         } @catch (NSException *exception) {
             NSLog(@"write to file error");
         }
@@ -190,6 +193,9 @@ static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
 }
 
 - (void)startWritting {
+    if (!self.writting) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
+    }
     self.writting = YES;
     self.startWriteDate = [NSDate date];
     self.writeBytes = 0;
@@ -198,9 +204,16 @@ static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
 - (void)finishWritting {
     if (self.writting) {
         self.writting = NO;
+        [[NSNotificationCenter defaultCenter] removeObserver:self];
         NSTimeInterval time = [[NSDate date] timeIntervalSinceDate:self.startWriteDate];
         [self.internalCacheConfiguration addDownloadedBytes:self.writeBytes spent:time];
     }
+}
+
+#pragma mark - Notification
+
+- (void)applicationDidEnterBackground:(NSNotification *)notification {
+    [self save];
 }
 
 @end

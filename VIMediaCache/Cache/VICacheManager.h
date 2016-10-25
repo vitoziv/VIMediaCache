@@ -20,6 +20,15 @@ extern NSString *VICacheContentLengthKey;
 + (void)setCacheDirectory:(NSString *)cacheDirectory;
 + (NSString *)cacheDirectory;
 
+
+/**
+ How often trigger `VICacheManagerDidUpdateCacheNotification` notification
+
+ @param interval Minimum interval
+ */
++ (void)setCacheUpdateNotifyInterval:(NSTimeInterval)interval;
++ (NSTimeInterval)cacheUpdateNotifyInterval;
+
 + (NSString *)cachedFilePathForURL:(NSURL *)url;
 + (VICacheConfiguration *)cacheConfigurationForURL:(NSURL *)url;
 
