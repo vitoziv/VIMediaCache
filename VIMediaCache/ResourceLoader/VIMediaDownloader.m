@@ -226,8 +226,6 @@ didReceiveResponse:(NSURLResponse *)response
           dataTask:(NSURLSessionDataTask *)dataTask
     didReceiveData:(NSData *)data {
     if (self.isCancelled) {
-        NSRange range = NSMakeRange(self.startOffset, data.length);
-        NSLog(@"!!! cancel %@: %@, cache data: %@, request: %@", dataTask, dataTask.originalRequest.allHTTPHeaderFields, NSStringFromRange(range), dataTask.currentRequest.allHTTPHeaderFields);
         return;
     }
     NSRange range = NSMakeRange(self.startOffset, data.length);
@@ -248,7 +246,6 @@ didCompleteWithError:(nullable NSError *)error {
             if ([self.delegate respondsToSelector:@selector(actionWorker:didFinishWithError:)]) {
                 [self.delegate actionWorker:self didFinishWithError:error];
             }
-            NSLog(@"request error %@, request header %@", error, task.currentRequest.allHTTPHeaderFields);
         } else {
             // Cancelled because of stop loading.
         }

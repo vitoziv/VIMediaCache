@@ -150,10 +150,7 @@ static NSString *kURLKey = @"kURLKey";
 
 - (void)save {
     @synchronized (self.internalCacheFragments) {
-        BOOL success = [NSKeyedArchiver archiveRootObject:self toFile:self.filePath];
-        if (!success) {
-            NSLog(@"#warning save configuration %@ failed", self.filePath);
-        }
+        [NSKeyedArchiver archiveRootObject:self toFile:self.filePath];
     }
 }
 

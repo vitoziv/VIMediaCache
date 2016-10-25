@@ -93,12 +93,9 @@
 
 - (void)mediaDownloader:(VIMediaDownloader *)downloader didFinishedWithError:(NSError *)error {
     if (error.code == NSURLErrorCancelled) {
-        NSLog(@"Cancel dwonload %@", self.request.dataRequest);
         return;
     }
     
-    AVAssetResourceLoadingDataRequest *dataRequest = self.request.dataRequest;
-    NSLog(@"finish downloader, currentOffset: %@, requestedOffset: %@, requestedLength: %@", @(dataRequest.currentOffset), @(dataRequest.requestedOffset), @(dataRequest.requestedLength));
     if (!error) {
         [self.request finishLoading];
     } else {

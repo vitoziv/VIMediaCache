@@ -48,7 +48,6 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
 - (void)addRequest:(AVAssetResourceLoadingRequest *)request {
     if (!self.isCancelled) {
         [self.pendingRequestWorkers enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, VIResourceLoadingRequestWorker * _Nonnull obj, BOOL * _Nonnull stop) {
-            NSLog(@"finish request worker: %@", obj);
             [obj finish];
         }];
         [self.pendingRequestWorkers removeAllObjects];
@@ -70,7 +69,6 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
 }
 
 - (void)cancel {
-    NSLog(@"%@, %@", self, NSStringFromSelector(_cmd));
     self.cancelled = YES;
     [self.mediaDownloader invalidateAndCancel];
 }
@@ -79,15 +77,6 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
 
 - (void)resourceLoadingRequestWorkerDidComplete:(VIResourceLoadingRequestWorker *)requestWorker {
     [self removeRequest:requestWorker.request];
-    
-    // Start previous cancelled request
-    NSDictionary *pendingRequestWorkers = [self.pendingRequestWorkers copy];
-    if (pendingRequestWorkers.count > 0) {
-        NSLog(@"*** try to start previous cancelled request");
-        //        NSString *key = [[pendingRequestWorkers allKeys] lastObject];
-        //        VIResourceLoadingRequestWorker *previousRequestWorker = (VIResourceLoadingRequestWorker *)pendingRequestWorkers[key];
-        //        [self startWorkerWithRequest:previousRequestWorker.request];
-    }
 }
 
 #pragma mark - Helper
