@@ -39,3 +39,9 @@
 - (void)addDownloadedBytes:(long long)bytes spent:(NSTimeInterval)time;
 
 @end
+
+@interface VICacheConfiguration (VIConvenient)
+
++ (BOOL)createAndSaveDownloadedConfigurationForURL:(NSURL *)url error:(NSError **)error;
+
+@end

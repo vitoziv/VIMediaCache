@@ -7,6 +7,8 @@
 //
 
 #import "VICacheConfiguration.h"
+#import "VICacheManager.h"
+#import <MobileCoreServices/MobileCoreServices.h>
 
 static NSString *kFileNameKey = @"kFileNameKey";
 static NSString *kCacheFragmentsKey = @"kCacheFragmentsKey";
@@ -202,6 +204,45 @@ static NSString *kURLKey = @"kURLKey";
     @synchronized (self.downloadInfo) {
         self.downloadInfo = [self.downloadInfo arrayByAddingObject:@[@(bytes), @(time)]];
     }
+}
+
+@end
+
+@implementation VICacheConfiguration (VIConvenient)
+
++ (BOOL)createAndSaveDownloadedConfigurationForURL:(NSURL *)url error:(NSError **)error {
+    NSString *filePath = [VICacheManager cachedFilePathForURL:url];
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSDictionary<NSFileAttributeKey, id> *attributes = [fileManager attributesOfItemAtPath:filePath error:error];
+    if (!attributes) {
+        return NO;
+    }
+    
+    long long fileSize = attributes.fileSize;
+    NSRange range = NSMakeRange(0, fileSize);
+    
+    VICacheConfiguration *configuration = [VICacheConfiguration configurationWithFilePath:filePath];
+    configuration.url = url;
+    
+    VIContentInfo *contentInfo = [VIContentInfo new];
+    
+    NSString *fileExtension = [url pathExtension];
+    NSString *UTI = (__bridge_transfer NSString *)UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, (__bridge CFStringRef)fileExtension, NULL);
+    NSString *contentType = (__bridge_transfer NSString *)UTTypeCopyPreferredTagWithClass((__bridge CFStringRef)UTI, kUTTagClassMIMEType);
+    if (!contentType) {
+        contentType = @"application/octet-stream";
+    }
+    contentInfo.contentType = contentType;
+    
+    contentInfo.contentLength = fileSize;
+    contentInfo.byteRangeAccessSupported = YES;
+    contentInfo.downloadedContentLength = fileSize;
+    configuration.contentInfo = contentInfo;
+    
+    [configuration addCacheFragment:range];
+    [configuration save];
+    
+    return YES;
 }
 
 @end

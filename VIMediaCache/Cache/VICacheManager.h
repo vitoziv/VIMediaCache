@@ -37,10 +37,20 @@ extern NSString *VICacheFinishedErrorKey;
  Calculate cached files size
 
  @param error
- @return files size, respresent by `byte`, if error occured return -1
+ @return files size, respresent by `byte`, if error occurs, return -1
  */
 + (unsigned long long)calculateCachedSizeWithError:(NSError **)error;
 + (void)cleanAllCacheWithError:(NSError **)error;
 + (void)cleanCacheForURL:(NSURL *)url error:(NSError **)error;
+
+
+/**
+ Useful when you upload a local file to the server
+
+ @param filePath local file path
+ @param url remote resource url
+ @param error On input, a pointer to an error object. If an error occurs, this pointer is set to an actual error object containing the error information.
+ */
++ (BOOL)addCacheFile:(NSString *)filePath forURL:(NSURL *)url error:(NSError **)error;
 
 @end

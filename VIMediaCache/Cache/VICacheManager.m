@@ -126,4 +126,30 @@ static NSTimeInterval kMCMediaCacheNotifyInterval;
     }
 }
 
++ (BOOL)addCacheFile:(NSString *)filePath forURL:(NSURL *)url error:(NSError **)error {
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    
+    NSString *cachePath = [VICacheManager cachedFilePathForURL:url];
+    NSString *cacheFolder = [cachePath stringByDeletingLastPathComponent];
+    if (![fileManager fileExistsAtPath:cacheFolder]) {
+        if (![fileManager createDirectoryAtPath:cacheFolder
+                    withIntermediateDirectories:YES
+                                     attributes:nil
+                                          error:error]) {
+            return NO;
+        }
+    }
+    
+    if (![fileManager copyItemAtPath:filePath toPath:cachePath error:error]) {
+        return NO;
+    }
+    
+    if (![VICacheConfiguration createAndSaveDownloadedConfigurationForURL:url error:error]) {
+        [fileManager removeItemAtPath:cachePath error:nil]; // if remove failed, there is nothing we can do.
+        return NO;
+    }
+    
+    return YES;
+}
+
 @end
