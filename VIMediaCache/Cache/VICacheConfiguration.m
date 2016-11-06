@@ -35,7 +35,7 @@ static NSString *kURLKey = @"kURLKey";
     }
     configuration.filePath = filePath;
     
-    return [configuration copy];
+    return configuration;
 }
 
 + (NSString *)configurationFilePathForFilePath:(NSString *)filePath {
@@ -126,27 +126,7 @@ static NSString *kURLKey = @"kURLKey";
     return configuration;
 }
 
-#pragma mark - NSMutableCopying
-
-- (id)mutableCopyWithZone:(nullable NSZone *)zone {
-    VIMutableCacheConfiguration *configuration = [[VIMutableCacheConfiguration allocWithZone:zone] init];
-    configuration.fileName = self.fileName;
-    configuration.filePath = self.filePath;
-    configuration.internalCacheFragments = self.internalCacheFragments;
-    configuration.downloadInfo = self.downloadInfo;
-    configuration.url = self.url;
-    configuration.contentInfo = self.contentInfo;
-    
-    return configuration;
-}
-
-@end
-
-@implementation VIMutableCacheConfiguration
-
-+ (instancetype)configurationWithFilePath:(NSString *)filePath {
-    return [[super configurationWithFilePath:filePath] mutableCopy];
-}
+#pragma mark - Update
 
 - (void)save {
     @synchronized (self.internalCacheFragments) {

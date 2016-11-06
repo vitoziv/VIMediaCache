@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "VIContentInfo.h"
 
-@interface VICacheConfiguration : NSObject <NSMutableCopying, NSCopying>
+@interface VICacheConfiguration : NSObject <NSCopying>
 
 + (NSString *)configurationFilePathForFilePath:(NSString *)filePath;
 
@@ -28,9 +28,7 @@
 @property (nonatomic, readonly) long long downloadedBytes;
 @property (nonatomic, readonly) float downloadSpeed; // kb/s
 
-@end
-
-@interface VIMutableCacheConfiguration : VICacheConfiguration
+#pragma mark - update API
 
 - (void)save;
 - (void)addCacheFragment:(NSRange)fragment;
