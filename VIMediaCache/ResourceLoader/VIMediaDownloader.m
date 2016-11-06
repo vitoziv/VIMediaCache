@@ -25,11 +25,14 @@
 
 @end
 
+static NSInteger kBufferSize = 10 * 1024;
+
 @interface VIURLSessionDelegateObject : NSObject <NSURLSessionDelegate>
 
 - (instancetype)initWithDelegate:(id<VIURLSessionDelegateObjectDelegate>)delegate;
 
 @property (nonatomic, weak) id<VIURLSessionDelegateObjectDelegate> delegate;
+@property (nonatomic, strong) NSMutableData *bufferData;
 
 @end
 
@@ -39,6 +42,7 @@
     self = [super init];
     if (self) {
         _delegate = delegate;
+        _bufferData = [NSMutableData data];
     }
     return self;
 }
@@ -55,17 +59,28 @@ didReceiveResponse:(NSURLResponse *)response
 - (void)URLSession:(NSURLSession *)session
           dataTask:(NSURLSessionDataTask *)dataTask
     didReceiveData:(NSData *)data {
-    [self.delegate URLSession:session dataTask:dataTask didReceiveData:data];
+    [self.bufferData appendData:data];
+    if (self.bufferData.length > kBufferSize) {
+        NSRange chunkRange = NSMakeRange(0, kBufferSize);
+        NSData *chunkData = [self.bufferData subdataWithRange:chunkRange];
+        [self.bufferData replaceBytesInRange:chunkRange withBytes:NULL length:0];
+        [self.delegate URLSession:session dataTask:dataTask didReceiveData:chunkData];
+    }
 }
 
 - (void)URLSession:(NSURLSession *)session
-              task:(NSURLSessionTask *)task
+              task:(NSURLSessionDataTask *)task
 didCompleteWithError:(nullable NSError *)error {
+    if (self.bufferData.length > 0) {
+        NSRange chunkRange = NSMakeRange(0, self.bufferData.length);
+        NSData *chunkData = [self.bufferData subdataWithRange:chunkRange];
+        [self.bufferData replaceBytesInRange:chunkRange withBytes:NULL length:0];
+        [self.delegate URLSession:session dataTask:task didReceiveData:chunkData];
+    }
     [self.delegate URLSession:session task:task didCompleteWithError:error];
 }
 
 @end
-
 
 #pragma mark - Class: VIActionWorker
 
