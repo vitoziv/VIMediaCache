@@ -10,10 +10,10 @@
 #import "VIMediaDownloader.h"
 
 NSString *VICacheManagerDidUpdateCacheNotification = @"VICacheManagerDidUpdateCacheNotification";
+NSString *VICacheManagerDidFinishCacheNotification = @"VICacheManagerDidFinishCacheNotification";
 
-NSString *VICacheURLKey = @"VICacheURLKey";
-NSString *VICacheFragmentsKey = @"VICacheFragmentsKey";
-NSString *VICacheContentLengthKey = @"VICacheContentLengthKey";
+NSString *VICacheConfigurationKey = @"VICacheConfigurationKey";
+NSString *VICacheFinishedErrorKey = @"VICacheFinishedErrorKey";
 
 static NSString *kMCMediaCacheDirectory;
 static NSTimeInterval kMCMediaCacheNotifyInterval;

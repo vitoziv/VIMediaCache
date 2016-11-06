@@ -162,7 +162,6 @@ didCompleteWithError:(nullable NSError *)error {
         if ([self.delegate respondsToSelector:@selector(actionWorker:didFinishWithError:)]) {
             [self.delegate actionWorker:self didFinishWithError:nil];
         }
-        [self notifyDownloadProgressWithFlush:YES];
         return;
     }
     [self.actions removeObjectAtIndex:0];
@@ -186,20 +185,33 @@ didCompleteWithError:(nullable NSError *)error {
     }
 }
 
-- (void)notifyDownloadProgressWithFlush:(BOOL)flush {
+- (void)notifyDownloadProgressWithFlush:(BOOL)flush finished:(BOOL)finished {
     double currentTime = CFAbsoluteTimeGetCurrent();
     double interval = [VICacheManager cacheUpdateNotifyInterval];
     if ((self.notifyTime < currentTime - interval) || flush) {
         self.notifyTime = currentTime;
-        VICacheConfiguration *configuration = self.cacheWorker.cacheConfiguration;
+        VICacheConfiguration *configuration = [self.cacheWorker.cacheConfiguration copy];
         [[NSNotificationCenter defaultCenter] postNotificationName:VICacheManagerDidUpdateCacheNotification
                                                             object:self
                                                           userInfo:@{
-                                                                     VICacheURLKey: configuration.url ?: [NSNull null],
-                                                                     VICacheFragmentsKey: configuration.cacheFragments,
-                                                                     VICacheContentLengthKey: @(configuration.contentInfo.contentLength)
+                                                                     VICacheConfigurationKey: configuration,
                                                                      }];
+            
+        if (finished && configuration.progress >= 1.0) {
+            [self notifyDownloadFinishedWithError:nil];
+        }
     }
+}
+
+- (void)notifyDownloadFinishedWithError:(NSError *)error {
+    VICacheConfiguration *configuration = [self.cacheWorker.cacheConfiguration copy];
+    NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
+    [userInfo setValue:configuration forKey:VICacheConfigurationKey];
+    [userInfo setValue:error forKey:VICacheFinishedErrorKey];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:VICacheManagerDidFinishCacheNotification
+                                                        object:self
+                                                      userInfo:userInfo];
 }
 
 #pragma mark - VIURLSessionDelegateObjectDelegate
@@ -230,30 +242,29 @@ didReceiveResponse:(NSURLResponse *)response
     }
     NSRange range = NSMakeRange(self.startOffset, data.length);
     [self.cacheWorker cacheData:data forRange:range];
+    [self.cacheWorker save];
     self.startOffset += data.length;
     if ([self.delegate respondsToSelector:@selector(actionWorker:didReceiveData:isLocal:)]) {
         [self.delegate actionWorker:self didReceiveData:data isLocal:NO];
     }
     
-    [self notifyDownloadProgressWithFlush:NO];
+    [self notifyDownloadProgressWithFlush:NO finished:NO];
 }
 
 - (void)URLSession:(NSURLSession *)session
               task:(NSURLSessionTask *)task
 didCompleteWithError:(nullable NSError *)error {
-    if (error) {
-        if (error.code != NSURLErrorCancelled) {
-            if ([self.delegate respondsToSelector:@selector(actionWorker:didFinishWithError:)]) {
-                [self.delegate actionWorker:self didFinishWithError:error];
-            }
-        } else {
-            // Cancelled because of stop loading.
-        }
-    } else {
-        [self processActions];
-    }
     [self.cacheWorker finishWritting];
     [self.cacheWorker save];
+    if (error) {
+        if ([self.delegate respondsToSelector:@selector(actionWorker:didFinishWithError:)]) {
+            [self.delegate actionWorker:self didFinishWithError:error];
+        }
+        [self notifyDownloadFinishedWithError:error];
+    } else {
+        [self notifyDownloadProgressWithFlush:YES finished:YES];
+        [self processActions];
+    }
 }
 
 @end

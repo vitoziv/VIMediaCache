@@ -10,10 +10,10 @@
 #import "VICacheConfiguration.h"
 
 extern NSString *VICacheManagerDidUpdateCacheNotification;
+extern NSString *VICacheManagerDidFinishCacheNotification;
 
-extern NSString *VICacheURLKey;
-extern NSString *VICacheFragmentsKey;
-extern NSString *VICacheContentLengthKey;
+extern NSString *VICacheConfigurationKey;
+extern NSString *VICacheFinishedErrorKey;
 
 @interface VICacheManager : NSObject
 
