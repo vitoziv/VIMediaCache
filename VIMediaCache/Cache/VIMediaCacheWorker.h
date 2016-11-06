@@ -13,7 +13,7 @@
 
 @interface VIMediaCacheWorker : NSObject
 
-- (instancetype)initWithCacheFilePath:(NSString *)path;
+- (instancetype)initWithURL:(NSURL *)url;
 
 @property (nonatomic, strong, readonly) VICacheConfiguration *cacheConfiguration;
 @property (nonatomic, strong, readonly) NSError *setupError; // Create fileHandler error, can't save/use cache

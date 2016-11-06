@@ -8,6 +8,7 @@
 
 #import "VIMediaCacheWorker.h"
 #import "VICacheAction.h"
+#import "VICacheManager.h"
 
 @import UIKit;
 
@@ -20,7 +21,7 @@ static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
 @property (nonatomic, strong) NSFileHandle *writeFileHandle;
 @property (nonatomic, strong, readwrite) NSError *setupError;
 @property (nonatomic, copy) NSString *filePath;
-@property (nonatomic, strong) VIMutableCacheConfiguration *internalCacheConfiguration;
+@property (nonatomic, strong) VICacheConfiguration *internalCacheConfiguration;
 
 @property (nonatomic) long long currentOffset;
 
@@ -39,9 +40,10 @@ static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
     [_writeFileHandle closeFile];
 }
 
-- (instancetype)initWithCacheFilePath:(NSString *)path {
+- (instancetype)initWithURL:(NSURL *)url {
     self = [super init];
     if (self) {
+        NSString *path = [VICacheManager cachedFilePathForURL:url];
         NSFileManager *fileManager = [NSFileManager defaultManager];
         _filePath = path;
         NSError *error;
@@ -61,7 +63,8 @@ static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
             _readFileHandle = [NSFileHandle fileHandleForReadingFromURL:fileURL error:&error];
             if (!error) {
                 _writeFileHandle = [NSFileHandle fileHandleForWritingToURL:fileURL error:&error];
-                _internalCacheConfiguration = [VIMutableCacheConfiguration configurationWithFilePath:path];
+                _internalCacheConfiguration = [VICacheConfiguration configurationWithFilePath:path];
+                _internalCacheConfiguration.url = url;
             }
         }
         
@@ -71,7 +74,7 @@ static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
 }
 
 - (VICacheConfiguration *)cacheConfiguration {
-    return [self.internalCacheConfiguration copy];
+    return self.internalCacheConfiguration;
 }
 
 - (void)cacheData:(NSData *)data forRange:(NSRange)range {

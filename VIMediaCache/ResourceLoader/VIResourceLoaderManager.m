@@ -11,7 +11,7 @@
 
 static NSString *kCacheScheme = @"VIMediaCache";
 
-@interface VIResourceLoaderManager ()
+@interface VIResourceLoaderManager () <VIResourceLoaderDelegate>
 
 @property (nonatomic, strong) NSMutableDictionary<id<NSCoding>, VIResourceLoader *> *loaders;
 
@@ -25,6 +25,10 @@ static NSString *kCacheScheme = @"VIMediaCache";
         _loaders = [NSMutableDictionary dictionary];
     }
     return self;
+}
+
+- (void)cleanCache {
+    [self.loaders removeAllObjects];
 }
 
 #pragma mark - AVAssetResourceLoaderDelegate
@@ -44,6 +48,7 @@ static NSString *kCacheScheme = @"VIMediaCache";
                 originURL = [NSURL URLWithString:url];
             }
             loader = [[VIResourceLoader alloc] initWithURL:originURL];
+            loader.delegate = self;
             NSString *key = [self keyForResourceLoaderWithURL:resourceURL];
             self.loaders[key] = loader;
         }
@@ -56,7 +61,17 @@ static NSString *kCacheScheme = @"VIMediaCache";
 
 - (void)resourceLoader:(AVAssetResourceLoader *)resourceLoader didCancelLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest {
     VIResourceLoader *loader = [self loaderForRequest:loadingRequest];
+    [loader cancel];
     [loader removeRequest:loadingRequest];
+}
+
+#pragma mark - VIResourceLoaderDelegate
+
+- (void)resourceLoader:(VIResourceLoader *)resourceLoader didFailWithError:(NSError *)error {
+    [resourceLoader cancel];
+    if ([self.delegate respondsToSelector:@selector(resourceLoaderManagerLoadURL:didFailWithError:)]) {
+        [self.delegate resourceLoaderManagerLoadURL:resourceLoader.url didFailWithError:error];
+    }
 }
 
 #pragma mark - Helper

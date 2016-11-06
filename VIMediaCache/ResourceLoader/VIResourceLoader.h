@@ -8,8 +8,12 @@
 
 #import <Foundation/Foundation.h>
 @import AVFoundation;
+@protocol VIResourceLoaderDelegate;
 
 @interface VIResourceLoader : NSObject
+
+@property (nonatomic, strong, readonly) NSURL *url;
+@property (nonatomic, weak) id<VIResourceLoaderDelegate> delegate;
 
 - (instancetype)initWithURL:(NSURL *)url;
 
@@ -17,5 +21,11 @@
 - (void)removeRequest:(AVAssetResourceLoadingRequest *)request;
 
 - (void)cancel;
+
+@end
+
+@protocol VIResourceLoaderDelegate <NSObject>
+
+- (void)resourceLoader:(VIResourceLoader *)resourceLoader didFailWithError:(NSError *)error;
 
 @end

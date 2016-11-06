@@ -58,7 +58,6 @@
 }
 
 - (void)finish {
-    [self.mediaDownloader cancel];
     if (!self.request.isFinished) {
         [self.request finishLoadingWithError:[self loaderCancelledError]];
     }
@@ -102,7 +101,7 @@
         [self.request finishLoadingWithError:error];
     }
     
-    [self.delegate resourceLoadingRequestWorkerDidComplete:self];
+    [self.delegate resourceLoadingRequestWorker:self didCompleteWithError:error];
 }
 
 @end

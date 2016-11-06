@@ -15,7 +15,7 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
 
 @interface VIResourceLoader () <VIResourceLoadingRequestWorkerDelegate>
 
-@property (nonatomic, strong) NSURL *url;
+@property (nonatomic, strong, readwrite) NSURL *url;
 @property (nonatomic, strong) VIMediaDownloader *mediaDownloader;
 @property (nonatomic, strong) NSMutableDictionary *pendingRequestWorkers;
 
@@ -46,18 +46,13 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
 }
 
 - (void)addRequest:(AVAssetResourceLoadingRequest *)request {
-    if (!self.isCancelled) {
-        [self.pendingRequestWorkers enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, VIResourceLoadingRequestWorker * _Nonnull obj, BOOL * _Nonnull stop) {
-            [obj finish];
-        }];
-        [self.pendingRequestWorkers removeAllObjects];
-        
-        [self startWorkerWithRequest:request];
-    } else {
-        if (!request.isFinished) {
-            [request finishLoadingWithError:[self loaderCancelledError]];
-        }
-    }
+    [self.pendingRequestWorkers enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, VIResourceLoadingRequestWorker * _Nonnull obj, BOOL * _Nonnull stop) {
+        [obj cancel];
+        [obj finish];
+    }];
+    [self.pendingRequestWorkers removeAllObjects];
+    
+    [self startWorkerWithRequest:request];
 }
 
 - (void)removeRequest:(AVAssetResourceLoadingRequest *)request {
@@ -69,14 +64,16 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
 }
 
 - (void)cancel {
-    self.cancelled = YES;
-    [self.mediaDownloader invalidateAndCancel];
+    [self.mediaDownloader cancel];
 }
 
 #pragma mark - VIResourceLoadingRequestWorkerDelegate
 
-- (void)resourceLoadingRequestWorkerDidComplete:(VIResourceLoadingRequestWorker *)requestWorker {
+- (void)resourceLoadingRequestWorker:(VIResourceLoadingRequestWorker *)requestWorker didCompleteWithError:(NSError *)error {
     [self removeRequest:requestWorker.request];
+    if (error && [self.delegate respondsToSelector:@selector(resourceLoader:didFailWithError:)]) {
+        [self.delegate resourceLoader:self didFailWithError:error];
+    }
 }
 
 #pragma mark - Helper

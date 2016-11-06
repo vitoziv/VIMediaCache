@@ -238,7 +238,8 @@ didReceiveResponse:(NSURLResponse *)response
     NSString *mimeType = response.MIMEType;
     // Only download video/audio data
     if ([mimeType rangeOfString:@"video/"].location == NSNotFound &&
-        [mimeType rangeOfString:@"audio/"].location == NSNotFound) {
+        [mimeType rangeOfString:@"audio/"].location == NSNotFound &&
+        [mimeType rangeOfString:@"application"].location == NSNotFound) {
         completionHandler(NSURLSessionResponseCancel);
     } else {
         if ([self.delegate respondsToSelector:@selector(actionWorker:didReceiveResponse:)]) {
@@ -355,9 +356,7 @@ didCompleteWithError:(nullable NSError *)error {
     self = [super init];
     if (self) {
         _url = url;
-        
-        NSString *filePath = [VICacheManager cachedFilePathForURL:url];
-        _cacheWorker = [[VIMediaCacheWorker alloc] initWithCacheFilePath:filePath];
+        _cacheWorker = [[VIMediaCacheWorker alloc] initWithURL:url];
         _info = _cacheWorker.cacheConfiguration.contentInfo;
     }
     return self;
@@ -413,15 +412,15 @@ didCompleteWithError:(nullable NSError *)error {
 
 - (void)cancel {
     [[VIMediaDownloaderStatus shared] removeURL:self.url];
-    self.actionWorker.delegate = nil;
     [self.actionWorker cancel];
+    self.actionWorker.delegate = nil;
     self.actionWorker = nil;
 }
 
 - (void)invalidateAndCancel {
     [[VIMediaDownloaderStatus shared] removeURL:self.url];
-    self.actionWorker.delegate = nil;
     [self.actionWorker cancel];
+    self.actionWorker.delegate = nil;
     self.actionWorker = nil;
 }
 
@@ -457,7 +456,6 @@ didCompleteWithError:(nullable NSError *)error {
         self.info = info;
         
         [self.cacheWorker setContentInfo:info];
-        self.cacheWorker.cacheConfiguration.url = response.URL;
     }
     
     if ([self.delegate respondsToSelector:@selector(mediaDownloader:didReceiveResponse:)]) {
@@ -474,13 +472,13 @@ didCompleteWithError:(nullable NSError *)error {
 - (void)actionWorker:(VIActionWorker *)actionWorker didFinishWithError:(NSError *)error {
     [[VIMediaDownloaderStatus shared] removeURL:self.url];
     
-    if ([self.delegate respondsToSelector:@selector(mediaDownloader:didFinishedWithError:)]) {
-        [self.delegate mediaDownloader:self didFinishedWithError:error];
-    }
-    
     if (!error && self.downloadToEnd) {
         self.downloadToEnd = NO;
         [self downloadTaskFromOffset:2 length:self.cacheWorker.cacheConfiguration.contentInfo.contentLength - 2 toEnd:YES];
+    } else {
+        if ([self.delegate respondsToSelector:@selector(mediaDownloader:didFinishedWithError:)]) {
+            [self.delegate mediaDownloader:self didFinishedWithError:error];
+        }
     }
 }
 
