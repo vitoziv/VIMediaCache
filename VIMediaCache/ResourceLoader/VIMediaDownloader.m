@@ -192,7 +192,7 @@ didCompleteWithError:(nullable NSError *)error {
         long long endOffset = action.range.location + action.range.length - 1;
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:self.url];
         request.cachePolicy = NSURLRequestReloadIgnoringLocalAndRemoteCacheData;
-        NSString *range = [NSString stringWithFormat:@"Bytes=%lld-%lld", fromOffset, endOffset];
+        NSString *range = [NSString stringWithFormat:@"bytes=%lld-%lld", fromOffset, endOffset];
         [request setValue:range forHTTPHeaderField:@"Range"];
         self.startOffset = action.range.location;
         self.task = [self.session dataTaskWithRequest:request];
