@@ -14,6 +14,7 @@
 
 static NSInteger const kPackageLength = 204800; // 200kb per package
 static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
+static NSString *VIMediaCacheErrorDoamin = @"com.vimediacache";
 
 @interface VIMediaCacheWorker ()
 
@@ -77,7 +78,7 @@ static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
     return self.internalCacheConfiguration;
 }
 
-- (void)cacheData:(NSData *)data forRange:(NSRange)range {
+- (void)cacheData:(NSData *)data forRange:(NSRange)range error:(NSError **)error {
     @synchronized(self.writeFileHandle) {
         @try {
             [self.writeFileHandle seekToFileOffset:range.location];
@@ -86,11 +87,12 @@ static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
             [self.internalCacheConfiguration addCacheFragment:range];
         } @catch (NSException *exception) {
             NSLog(@"write to file error");
+            *error = [NSError errorWithDomain:exception.name code:123 userInfo:@{NSLocalizedDescriptionKey: exception.reason, @"exception": exception}];
         }
     }
 }
 
-- (NSData *)cachedDataForRange:(NSRange)range {
+- (NSData *)cachedDataForRange:(NSRange)range error:(NSError **)error {
     @synchronized(self.readFileHandle) {
         @try {
             [self.readFileHandle seekToFileOffset:range.location];
@@ -98,6 +100,7 @@ static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
             return data;
         } @catch (NSException *exception) {
             NSLog(@"read cached data error %@",exception);
+            *error = [NSError errorWithDomain:exception.name code:123 userInfo:@{NSLocalizedDescriptionKey: exception.reason, @"exception": exception}];
         }
     }
     return nil;
@@ -181,11 +184,15 @@ static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
     return [actions copy];
 }
 
-- (void)setContentInfo:(VIContentInfo *)contentInfo {
+- (void)setContentInfo:(VIContentInfo *)contentInfo error:(NSError **)error {
     self.internalCacheConfiguration.contentInfo = contentInfo;
-    
-    [self.writeFileHandle truncateFileAtOffset:contentInfo.contentLength];
-    [self.writeFileHandle synchronizeFile];
+    @try {
+        [self.writeFileHandle truncateFileAtOffset:contentInfo.contentLength];
+        [self.writeFileHandle synchronizeFile];
+    } @catch (NSException *exception) {
+        NSLog(@"read cached data error %@", exception);
+        *error = [NSError errorWithDomain:exception.name code:123 userInfo:@{NSLocalizedDescriptionKey: exception.reason, @"exception": exception}];
+    }
 }
 
 - (void)save {

@@ -18,11 +18,11 @@
 @property (nonatomic, strong, readonly) VICacheConfiguration *cacheConfiguration;
 @property (nonatomic, strong, readonly) NSError *setupError; // Create fileHandler error, can't save/use cache
 
-- (void)cacheData:(NSData *)data forRange:(NSRange)range;
+- (void)cacheData:(NSData *)data forRange:(NSRange)range error:(NSError **)error;
 - (NSArray<VICacheAction *> *)cachedDataActionsForRange:(NSRange)range;
-- (NSData *)cachedDataForRange:(NSRange)range;
+- (NSData *)cachedDataForRange:(NSRange)range error:(NSError **)error;
 
-- (void)setContentInfo:(VIContentInfo *)contentInfo;
+- (void)setContentInfo:(VIContentInfo *)contentInfo error:(NSError **)error;
 
 - (void)save;
 

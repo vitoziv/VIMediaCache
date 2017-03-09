@@ -182,11 +182,18 @@ didCompleteWithError:(nullable NSError *)error {
     [self.actions removeObjectAtIndex:0];
     
     if (action.actionType == VICacheAtionTypeLocal) {
-        NSData *data = [self.cacheWorker cachedDataForRange:action.range];
-        if ([self.delegate respondsToSelector:@selector(actionWorker:didReceiveData:isLocal:)]) {
-            [self.delegate actionWorker:self didReceiveData:data isLocal:YES];
+        NSError *error;
+        NSData *data = [self.cacheWorker cachedDataForRange:action.range error:&error];
+        if (error) {
+            if ([self.delegate respondsToSelector:@selector(actionWorker:didFinishWithError:)]) {
+                [self.delegate actionWorker:self didFinishWithError:error];
+            }
+        } else {
+            if ([self.delegate respondsToSelector:@selector(actionWorker:didReceiveData:isLocal:)]) {
+                [self.delegate actionWorker:self didReceiveData:data isLocal:YES];
+            }
+            [self processActions];
         }
-        [self processActions];
     } else {
         long long fromOffset = action.range.location;
         long long endOffset = action.range.location + action.range.length - 1;
@@ -257,7 +264,14 @@ didReceiveResponse:(NSURLResponse *)response
         return;
     }
     NSRange range = NSMakeRange(self.startOffset, data.length);
-    [self.cacheWorker cacheData:data forRange:range];
+    NSError *error;
+    [self.cacheWorker cacheData:data forRange:range error:&error];
+    if (error) {
+        if ([self.delegate respondsToSelector:@selector(actionWorker:didFinishWithError:)]) {
+            [self.delegate actionWorker:self didFinishWithError:error];
+        }
+        return;
+    }
     [self.cacheWorker save];
     self.startOffset += data.length;
     if ([self.delegate respondsToSelector:@selector(actionWorker:didReceiveData:isLocal:)]) {
@@ -455,7 +469,14 @@ didCompleteWithError:(nullable NSError *)error {
         info.contentType = CFBridgingRelease(contentType);
         self.info = info;
         
-        [self.cacheWorker setContentInfo:info];
+        NSError *error;
+        [self.cacheWorker setContentInfo:info error:&error];
+        if (error) {
+            if ([self.delegate respondsToSelector:@selector(mediaDownloader:didFinishedWithError:)]) {
+                [self.delegate mediaDownloader:self didFinishedWithError:error];
+            }
+            return;
+        }
     }
     
     if ([self.delegate respondsToSelector:@selector(mediaDownloader:didReceiveResponse:)]) {
