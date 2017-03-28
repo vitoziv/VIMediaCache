@@ -71,7 +71,7 @@ didReceiveResponse:(NSURLResponse *)response
 - (void)URLSession:(NSURLSession *)session
               task:(NSURLSessionDataTask *)task
 didCompleteWithError:(nullable NSError *)error {
-    if (self.bufferData.length > 0) {
+    if (self.bufferData.length > 0 && !error) {
         NSRange chunkRange = NSMakeRange(0, self.bufferData.length);
         NSData *chunkData = [self.bufferData subdataWithRange:chunkRange];
         [self.bufferData replaceBytesInRange:chunkRange withBytes:NULL length:0];
