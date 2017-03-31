@@ -59,23 +59,27 @@ didReceiveResponse:(NSURLResponse *)response
 - (void)URLSession:(NSURLSession *)session
           dataTask:(NSURLSessionDataTask *)dataTask
     didReceiveData:(NSData *)data {
-    [self.bufferData appendData:data];
-    if (self.bufferData.length > kBufferSize) {
-        NSRange chunkRange = NSMakeRange(0, kBufferSize);
-        NSData *chunkData = [self.bufferData subdataWithRange:chunkRange];
-        [self.bufferData replaceBytesInRange:chunkRange withBytes:NULL length:0];
-        [self.delegate URLSession:session dataTask:dataTask didReceiveData:chunkData];
+    @synchronized (self.bufferData) {
+        [self.bufferData appendData:data];
+        if (self.bufferData.length > kBufferSize) {
+            NSRange chunkRange = NSMakeRange(0, kBufferSize);
+            NSData *chunkData = [self.bufferData subdataWithRange:chunkRange];
+            [self.bufferData replaceBytesInRange:chunkRange withBytes:NULL length:0];
+            [self.delegate URLSession:session dataTask:dataTask didReceiveData:chunkData];
+        }
     }
 }
 
 - (void)URLSession:(NSURLSession *)session
               task:(NSURLSessionDataTask *)task
 didCompleteWithError:(nullable NSError *)error {
-    if (self.bufferData.length > 0 && !error) {
-        NSRange chunkRange = NSMakeRange(0, self.bufferData.length);
-        NSData *chunkData = [self.bufferData subdataWithRange:chunkRange];
-        [self.bufferData replaceBytesInRange:chunkRange withBytes:NULL length:0];
-        [self.delegate URLSession:session dataTask:task didReceiveData:chunkData];
+    @synchronized (self.bufferData) {
+        if (self.bufferData.length > 0 && !error) {
+            NSRange chunkRange = NSMakeRange(0, self.bufferData.length);
+            NSData *chunkData = [self.bufferData subdataWithRange:chunkRange];
+            [self.bufferData replaceBytesInRange:chunkRange withBytes:NULL length:0];
+            [self.delegate URLSession:session dataTask:task didReceiveData:chunkData];
+        }
     }
     [self.delegate URLSession:session task:task didCompleteWithError:error];
 }
