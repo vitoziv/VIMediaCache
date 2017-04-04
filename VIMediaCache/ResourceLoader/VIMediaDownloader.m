@@ -62,7 +62,7 @@ didReceiveResponse:(NSURLResponse *)response
     @synchronized (self.bufferData) {
         [self.bufferData appendData:data];
         if (self.bufferData.length > kBufferSize) {
-            NSRange chunkRange = NSMakeRange(0, kBufferSize);
+            NSRange chunkRange = NSMakeRange(0, self.bufferData.length);
             NSData *chunkData = [self.bufferData subdataWithRange:chunkRange];
             [self.bufferData replaceBytesInRange:chunkRange withBytes:NULL length:0];
             [self.delegate URLSession:session dataTask:dataTask didReceiveData:chunkData];
