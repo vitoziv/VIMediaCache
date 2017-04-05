@@ -31,6 +31,13 @@ static NSString *kCacheScheme = @"VIMediaCache";
     [self.loaders removeAllObjects];
 }
 
+- (void)cancelLoaders {
+    [self.loaders enumerateKeysAndObjectsUsingBlock:^(id<NSCoding>  _Nonnull key, VIResourceLoader * _Nonnull obj, BOOL * _Nonnull stop) {
+        [obj cancel];
+    }];
+    [self.loaders removeAllObjects];
+}
+
 #pragma mark - AVAssetResourceLoaderDelegate
 
 - (BOOL)resourceLoader:(AVAssetResourceLoader *)resourceLoader shouldWaitForLoadingOfRequestedResource:(AVAssetResourceLoadingRequest *)loadingRequest  {

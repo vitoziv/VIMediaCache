@@ -21,6 +21,11 @@
  */
 - (void)cleanCache;
 
+/**
+ Cancel all downloading loaders.
+ */
+- (void)cancelLoaders;
+
 @end
 
 @protocol VIResourceLoaderManagerDelegate <NSObject>

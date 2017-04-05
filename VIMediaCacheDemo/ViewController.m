@@ -39,15 +39,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    unsigned long long fileSize = [VICacheManager calculateCachedSizeWithError:nil];
-    NSLog(@"file cache size: %@", @(fileSize));
-    NSError *error;
-    [VICacheManager cleanAllCacheWithError:&error];
-    if (error) {
-        NSLog(@"clean cache failure: %@", error);
-    }
-    
-    [VICacheManager cleanAllCacheWithError:&error];
+    [self cleanCache];
     
     
 //    NSURL *url = [NSURL URLWithString:@"https://mvvideo5.meitudata.com/56ea0e90d6cb2653.mp4"];
@@ -65,6 +57,18 @@
     [self.player play];
 }
 
+- (void)cleanCache {
+    unsigned long long fileSize = [VICacheManager calculateCachedSizeWithError:nil];
+    NSLog(@"file cache size: %@", @(fileSize));
+    NSError *error;
+    [VICacheManager cleanAllCacheWithError:&error];
+    if (error) {
+        NSLog(@"clean cache failure: %@", error);
+    }
+    
+    [VICacheManager cleanAllCacheWithError:&error];
+}
+
 - (IBAction)touchSliderAction:(UISlider *)sender {
     sender.tag = -1;
 }
@@ -79,6 +83,21 @@
         sender.tag = 0;
         [weakSelf.player play];
     }];
+}
+
+- (IBAction)toggleAction:(id)sender {
+    [self cleanCache];
+    
+    [self.playerItem removeObserver:self forKeyPath:@"status"];
+    
+    [self.resourceLoaderManager cancelLoaders];
+    
+    NSURL *url = [NSURL URLWithString:@"https://mvvideo5.meitudata.com/56ea0e90d6cb2653.mp4"];
+    AVPlayerItem *playerItem = [self.resourceLoaderManager playerItemWithURL:url];
+    self.playerItem = playerItem;
+    
+    [self.playerItem addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionNew context:nil];
+    [self.player replaceCurrentItemWithPlayerItem:playerItem];
 }
 
 #pragma mark - Setup
