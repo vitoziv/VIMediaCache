@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@protocol MediaDownloaderDelegate;
+@protocol VIMediaDownloaderDelegate;
 @class VIContentInfo;
 
 @interface VIMediaDownloaderStatus : NSObject
@@ -27,7 +27,7 @@
 
 - (instancetype)initWithURL:(NSURL *)url;
 @property (nonatomic, strong, readonly) NSURL *url;
-@property (nonatomic, weak) id<MediaDownloaderDelegate> delegate;
+@property (nonatomic, weak) id<VIMediaDownloaderDelegate> delegate;
 @property (nonatomic, strong) VIContentInfo *info;
 
 - (void)downloadTaskFromOffset:(unsigned long long)fromOffset
@@ -40,7 +40,7 @@
 
 @end
 
-@protocol MediaDownloaderDelegate <NSObject>
+@protocol VIMediaDownloaderDelegate <NSObject>
 
 @optional
 - (void)mediaDownloader:(VIMediaDownloader *)downloader didReceiveResponse:(NSURLResponse *)response;

@@ -102,6 +102,10 @@ static NSString *kCacheScheme = @"VIMediaCache";
 @implementation VIResourceLoaderManager (Convenient)
 
 + (NSURL *)assetURLWithURL:(NSURL *)url {
+    if (!url) {
+        return nil;
+    }
+    
     NSURLComponents *componnents = [[NSURLComponents alloc] initWithURL:url resolvingAgainstBaseURL:NO];
     componnents.scheme = kCacheScheme;
     

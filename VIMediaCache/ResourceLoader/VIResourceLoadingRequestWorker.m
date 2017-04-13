@@ -14,7 +14,7 @@
 @import AVFoundation;
 @import UIKit;
 
-@interface VIResourceLoadingRequestWorker () <MediaDownloaderDelegate>
+@interface VIResourceLoadingRequestWorker () <VIMediaDownloaderDelegate>
 
 @property (nonatomic, strong, readwrite) AVAssetResourceLoadingRequest *request;
 @property (nonatomic, strong) VIMediaDownloader *mediaDownloader;
@@ -80,7 +80,7 @@
     }
 }
 
-#pragma mark - MediaDownloaderDelegate
+#pragma mark - VIMediaDownloaderDelegate
 
 - (void)mediaDownloader:(VIMediaDownloader *)downloader didReceiveResponse:(NSURLResponse *)response {
     [self fullfillContentInfo];
