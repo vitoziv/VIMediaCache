@@ -354,8 +354,6 @@ didCompleteWithError:(nullable NSError *)error {
 @interface VIMediaDownloader () <VIActionWorkerDelegate>
 
 @property (nonatomic, strong) NSURL *url;
-@property (nonatomic, strong) NSURLSession *session;
-@property (nonatomic, strong) NSURLSessionDataTask *task;
 
 @property (nonatomic, strong) VIMediaCacheWorker *cacheWorker;
 @property (nonatomic, strong) VIActionWorker *actionWorker;
@@ -378,14 +376,6 @@ didCompleteWithError:(nullable NSError *)error {
         _info = _cacheWorker.cacheConfiguration.contentInfo;
     }
     return self;
-}
-
-- (NSURLSession *)session {
-    if (!_session) {
-        NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
-        _session = [NSURLSession sessionWithConfiguration:configuration];
-    }
-    return _session;
 }
 
 - (void)downloadTaskFromOffset:(unsigned long long)fromOffset
