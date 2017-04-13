@@ -14,15 +14,21 @@ static NSString *kCacheScheme = @"VIMediaCache";
 @interface VIResourceLoaderManager () <VIResourceLoaderDelegate>
 
 @property (nonatomic, strong) NSMutableDictionary<id<NSCoding>, VIResourceLoader *> *loaders;
+@property (nonatomic, assign) BOOL allowsCellularAccess;
 
 @end
 
 @implementation VIResourceLoaderManager
 
 - (instancetype)init {
+    return [self initWithAllowsCellularAccess:NO];
+}
+
+- (instancetype)initWithAllowsCellularAccess:(BOOL)allowsCellularAccess {
     self = [super init];
     if (self) {
         _loaders = [NSMutableDictionary dictionary];
+        _allowsCellularAccess = allowsCellularAccess;
     }
     return self;
 }
@@ -54,7 +60,7 @@ static NSString *kCacheScheme = @"VIMediaCache";
                 NSString *url = [[components.query componentsSeparatedByString:@"="] lastObject];
                 originURL = [NSURL URLWithString:url];
             }
-            loader = [[VIResourceLoader alloc] initWithURL:originURL];
+            loader = [[VIResourceLoader alloc] initWithURL:originURL allowsCellularAccess:self.allowsCellularAccess];
             loader.delegate = self;
             NSString *key = [self keyForResourceLoaderWithURL:resourceURL];
             self.loaders[key] = loader;

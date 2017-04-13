@@ -15,6 +15,8 @@
 
 @property (nonatomic, weak) id<VIResourceLoaderManagerDelegate> delegate;
 
+- (instancetype)initWithAllowsCellularAccess:(BOOL)allowsCellularAccess;
+
 /**
  Normally you no need to call this method to clean cache. Cache cleaned after AVPlayer delloc.
  If you have a singleton AVPlayer then you need call this method to clean cache at suitable time.

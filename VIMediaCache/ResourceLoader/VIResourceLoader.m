@@ -30,11 +30,11 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
     [_mediaDownloader invalidateAndCancel];
 }
 
-- (instancetype)initWithURL:(NSURL *)url {
+- (instancetype)initWithURL:(NSURL *)url allowsCellularAccess:(BOOL)allowsCellularAccess {
     self = [super init];
     if (self) {
         _url = url;
-        _mediaDownloader = [[VIMediaDownloader alloc] initWithURL:url];
+        _mediaDownloader = [[VIMediaDownloader alloc] initWithURL:url allowsCellularAccess:allowsCellularAccess];
         _pendingRequestWorkers = [NSMutableDictionary dictionary];
     }
     return self;

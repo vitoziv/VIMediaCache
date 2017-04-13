@@ -15,7 +15,7 @@
 @property (nonatomic, strong, readonly) NSURL *url;
 @property (nonatomic, weak) id<VIResourceLoaderDelegate> delegate;
 
-- (instancetype)initWithURL:(NSURL *)url;
+- (instancetype)initWithURL:(NSURL *)url allowsCellularAccess:(BOOL)allowsCellularAccess;
 
 - (void)addRequest:(AVAssetResourceLoadingRequest *)request;
 - (void)removeRequest:(AVAssetResourceLoadingRequest *)request;
