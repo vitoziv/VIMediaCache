@@ -101,7 +101,7 @@ didCompleteWithError:(nullable NSError *)error {
 @interface VIActionWorker : NSObject <VIURLSessionDelegateObjectDelegate>
 
 @property (nonatomic, strong) NSMutableArray<VICacheAction *> *actions;
-- (instancetype)initWithActions:(NSArray<VICacheAction *> *)actions url:(NSURL *)url cacheWorker:(VIMediaCacheWorker *)cacheWorker;
+- (instancetype)initWithActions:(NSArray<VICacheAction *> *)actions url:(NSURL *)url cacheWorker:(VIMediaCacheWorker *)cacheWorker allowsCellularAccess:(BOOL)allowsCellularAccess;
 
 @property (nonatomic, weak) id<VIActionWorkerDelegate> delegate;
 
@@ -113,6 +113,7 @@ didCompleteWithError:(nullable NSError *)error {
 
 @property (nonatomic, strong) VIMediaCacheWorker *cacheWorker;
 @property (nonatomic, strong) NSURL *url;
+@property (nonatomic, assign) BOOL allowsCellularAccess;
 
 @property (nonatomic, strong) NSURLSession *session;
 @property (nonatomic, strong) VIURLSessionDelegateObject *sessionDelegateObject;
@@ -133,12 +134,13 @@ didCompleteWithError:(nullable NSError *)error {
     [self cancel];
 }
 
-- (instancetype)initWithActions:(NSArray<VICacheAction *> *)actions url:(NSURL *)url cacheWorker:(VIMediaCacheWorker *)cacheWorker {
+- (instancetype)initWithActions:(NSArray<VICacheAction *> *)actions url:(NSURL *)url cacheWorker:(VIMediaCacheWorker *)cacheWorker allowsCellularAccess:(BOOL)allowsCellularAccess {
     self = [super init];
     if (self) {
         _actions = [actions mutableCopy];
         _cacheWorker = cacheWorker;
         _url = url;
+        _allowsCellularAccess = allowsCellularAccess;
     }
     return self;
 }
@@ -165,6 +167,7 @@ didCompleteWithError:(nullable NSError *)error {
 - (NSURLSession *)session {
     if (!_session) {
         NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+        configuration.allowsCellularAccess = self.allowsCellularAccess;
         NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration delegate:self.sessionDelegateObject delegateQueue:[VICacheSessionManager shared].downloadQueue];
         _session = session;
     }
@@ -354,6 +357,7 @@ didCompleteWithError:(nullable NSError *)error {
 @interface VIMediaDownloader () <VIActionWorkerDelegate>
 
 @property (nonatomic, strong) NSURL *url;
+@property (nonatomic, assign) BOOL allowsCellularAccess;
 
 @property (nonatomic, strong) VIMediaCacheWorker *cacheWorker;
 @property (nonatomic, strong) VIActionWorker *actionWorker;
@@ -368,12 +372,13 @@ didCompleteWithError:(nullable NSError *)error {
     [[VIMediaDownloaderStatus shared] removeURL:self.url];
 }
 
-- (instancetype)initWithURL:(NSURL *)url {
+- (instancetype)initWithURL:(NSURL *)url allowsCellularAccess:(BOOL)allowsCellularAccess {
     self = [super init];
     if (self) {
         _url = url;
         _cacheWorker = [[VIMediaCacheWorker alloc] initWithURL:url];
         _info = _cacheWorker.cacheConfiguration.contentInfo;
+        _allowsCellularAccess = allowsCellularAccess;
     }
     return self;
 }
@@ -396,7 +401,7 @@ didCompleteWithError:(nullable NSError *)error {
     
     NSArray *actions = [self.cacheWorker cachedDataActionsForRange:range];
 
-    self.actionWorker = [[VIActionWorker alloc] initWithActions:actions url:self.url cacheWorker:self.cacheWorker];
+    self.actionWorker = [[VIActionWorker alloc] initWithActions:actions url:self.url cacheWorker:self.cacheWorker allowsCellularAccess:self.allowsCellularAccess];
     self.actionWorker.delegate = self;
     [self.actionWorker start];
 }
@@ -413,7 +418,7 @@ didCompleteWithError:(nullable NSError *)error {
     NSRange range = NSMakeRange(0, 2);
     NSArray *actions = [self.cacheWorker cachedDataActionsForRange:range];
 
-    self.actionWorker = [[VIActionWorker alloc] initWithActions:actions url:self.url cacheWorker:self.cacheWorker];
+    self.actionWorker = [[VIActionWorker alloc] initWithActions:actions url:self.url cacheWorker:self.cacheWorker allowsCellularAccess:self.allowsCellularAccess];
     self.actionWorker.delegate = self;
     [self.actionWorker start];
 }

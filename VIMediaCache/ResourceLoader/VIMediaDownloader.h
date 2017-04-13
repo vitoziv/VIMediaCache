@@ -25,7 +25,7 @@
 
 @interface VIMediaDownloader : NSObject
 
-- (instancetype)initWithURL:(NSURL *)url;
+- (instancetype)initWithURL:(NSURL *)url allowsCellularAccess:(BOOL)allowsCellularAccess;
 @property (nonatomic, strong, readonly) NSURL *url;
 @property (nonatomic, weak) id<VIMediaDownloaderDelegate> delegate;
 @property (nonatomic, strong) VIContentInfo *info;
