@@ -499,7 +499,7 @@ didCompleteWithError:(nullable NSError *)error {
     
     if (!error && self.downloadToEnd) {
         self.downloadToEnd = NO;
-        [self downloadTaskFromOffset:2 length:self.cacheWorker.cacheConfiguration.contentInfo.contentLength - 2 toEnd:YES];
+        [self downloadTaskFromOffset:2 length:(NSInteger)self.cacheWorker.cacheConfiguration.contentInfo.contentLength - 2 toEnd:YES];
     } else {
         if ([self.delegate respondsToSelector:@selector(mediaDownloader:didFinishedWithError:)]) {
             [self.delegate mediaDownloader:self didFinishedWithError:error];
