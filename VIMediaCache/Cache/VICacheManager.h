@@ -36,7 +36,7 @@ extern NSString *VICacheFinishedErrorKey;
 /**
  Calculate cached files size
 
- @param error
+ @param error If error not empty, calculate failed
  @return files size, respresent by `byte`, if error occurs, return -1
  */
 + (unsigned long long)calculateCachedSizeWithError:(NSError **)error;
