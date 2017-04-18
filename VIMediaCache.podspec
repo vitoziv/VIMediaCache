@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
     s.name = 'VIMediaCache'
-    s.version = '0.2'
+    s.version = '0.3'
     s.license = 'MIT'
     s.summary = 'VIMediaCache is a tool to cache media file while play media using AVPlayer'
     s.homepage = 'https://github.com/vitoziv/VIMediaCache'

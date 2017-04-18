@@ -1,8 +1,10 @@
 # VIMediaCache
 
+[中文说明](https://mp.weixin.qq.com/s/v1sw_Sb8oKeZ8sWyjBUXGA)
+
 Cache media file while play media using AVPlayerr.
 
-VIMediaCache use AVAssetResourceLoader to control AVPlayer download media data, then manage cache data using NSURLProtocol.
+VIMediaCache use AVAssetResourceLoader to control AVPlayer download media data.
 
 ### CocoaPods
 
