@@ -31,7 +31,7 @@
 @property (nonatomic, strong) VIContentInfo *info;
 
 - (void)downloadTaskFromOffset:(unsigned long long)fromOffset
-                        length:(NSInteger)length
+                        length:(NSUInteger)length
                          toEnd:(BOOL)toEnd;
 - (void)downloadFromStartToEnd;
 

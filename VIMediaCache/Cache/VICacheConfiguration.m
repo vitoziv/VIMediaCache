@@ -218,7 +218,7 @@ static NSString *kURLKey = @"kURLKey";
         return NO;
     }
     
-    NSInteger fileSize = (NSInteger)attributes.fileSize;
+    NSUInteger fileSize = (NSUInteger)attributes.fileSize;
     NSRange range = NSMakeRange(0, fileSize);
     
     VICacheConfiguration *configuration = [VICacheConfiguration configurationWithFilePath:filePath];

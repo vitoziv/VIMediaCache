@@ -389,7 +389,7 @@ didCompleteWithError:(nullable NSError *)error {
 }
 
 - (void)downloadTaskFromOffset:(unsigned long long)fromOffset
-                        length:(NSInteger)length
+                        length:(NSUInteger)length
                          toEnd:(BOOL)toEnd {
     if ([self isCurrentURLDownloading]) {
         [self handleCurrentURLDownloadingError];
@@ -401,7 +401,7 @@ didCompleteWithError:(nullable NSError *)error {
     NSRange range = NSMakeRange((NSUInteger)fromOffset, length);
     
     if (toEnd) {
-        range.length = (NSInteger)self.cacheWorker.cacheConfiguration.contentInfo.contentLength - range.location;
+        range.length = (NSUInteger)self.cacheWorker.cacheConfiguration.contentInfo.contentLength - range.location;
     }
     
     NSArray *actions = [self.cacheWorker cachedDataActionsForRange:range];
@@ -499,7 +499,7 @@ didCompleteWithError:(nullable NSError *)error {
     
     if (!error && self.downloadToEnd) {
         self.downloadToEnd = NO;
-        [self downloadTaskFromOffset:2 length:(NSInteger)self.cacheWorker.cacheConfiguration.contentInfo.contentLength - 2 toEnd:YES];
+        [self downloadTaskFromOffset:2 length:(NSUInteger)(self.cacheWorker.cacheConfiguration.contentInfo.contentLength - 2) toEnd:YES];
     } else {
         if ([self.delegate respondsToSelector:@selector(mediaDownloader:didFinishedWithError:)]) {
             [self.delegate mediaDownloader:self didFinishedWithError:error];
