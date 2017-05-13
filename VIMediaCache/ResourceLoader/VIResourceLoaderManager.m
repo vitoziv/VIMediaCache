@@ -49,9 +49,11 @@ static NSString *kCacheScheme = @"VIMediaCache";
             NSURL *originURL;
             if ([components respondsToSelector:@selector(queryItems)]) {
                 NSURLQueryItem *queryItem = [components.queryItems lastObject];
-                originURL = [NSURL URLWithString:queryItem.value];
+                NSString *urlString = [queryItem.value stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+                originURL = [NSURL URLWithString:urlString];
             } else {
                 NSString *url = [[components.query componentsSeparatedByString:@"="] lastObject];
+                url = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
                 originURL = [NSURL URLWithString:url];
             }
             loader = [[VIResourceLoader alloc] initWithURL:originURL];
