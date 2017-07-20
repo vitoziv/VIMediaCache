@@ -103,7 +103,7 @@
 #pragma mark - Setup
 
 - (void)setupPlayer {
-        NSURL *url = [NSURL URLWithString:@"http://mpvideo-test.b0.upaiyun.com/5813998fb092e5771.mp4"];
+        NSURL *url = [NSURL URLWithString:@"http://gedftnj8mkvfefuaefm.exp.bcevod.com/mda-hc2s2difdjz6c5y9/hd/mda-hc2s2difdjz6c5y9.mp4?playlist%3D%5B%22hd%22%5D&auth_key=1500559192-0-0-dcb501bf19beb0bd4e0f7ad30c380763&bcevod_channel=searchbox_feed&srchid=3ed366b1b0bf70e0&channel_id=2&d_t=2&b_v=9.1.0.0"];
 //        NSURL *url = [NSURL URLWithString:@"https://mvvideo5.meitudata.com/56a9e1389b9706520.mp4"];
 //        NSURL *url = [NSURL URLWithString:@"http://media-test.1iptv.com/recordings/z1.meipai-live-test.57d15a1f1013858cda04d060/z157d15a1f1013858cda04d060.m3u8?start=-1&end=-1"];
 //    NSURL *url = [NSURL URLWithString:@"http://nightwander.s.qupai.me/v/7f7aa378-b80e-44e8-a326-32b19614218f.mp4?token=AMIRnTPJEMn9iZslnQZp3bKNGNtBnSC10MYJDIyMDNyAyMkNGOwQmNkJGO3AjYwIDIyACNzIDMyczM4QTM"];
