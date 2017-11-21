@@ -8,6 +8,7 @@
 
 #import "VICacheManager.h"
 #import "VIMediaDownloader.h"
+#import "NSString+VIMD5.h"
 
 NSString *VICacheManagerDidUpdateCacheNotification = @"VICacheManagerDidUpdateCacheNotification";
 NSString *VICacheManagerDidFinishCacheNotification = @"VICacheManagerDidFinishCacheNotification";
@@ -45,7 +46,8 @@ static NSTimeInterval kMCMediaCacheNotifyInterval;
 }
 
 + (NSString *)cachedFilePathForURL:(NSURL *)url {
-    return [[self cacheDirectory] stringByAppendingPathComponent:[url lastPathComponent]];
+    NSString *pathComponent = [url.absoluteString vi_md5];
+    return [[self cacheDirectory] stringByAppendingPathComponent:pathComponent];
 }
 
 + (VICacheConfiguration *)cacheConfigurationForURL:(NSURL *)url {

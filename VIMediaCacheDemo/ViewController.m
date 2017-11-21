@@ -34,6 +34,7 @@
     [self.player removeTimeObserver:self.timeObserver];
     self.timeObserver = nil;
     [self.playerItem removeObserver:self forKeyPath:@"status"];
+    [self.player removeObserver:self forKeyPath:@"timeControlStatus"];
 }
 
 - (void)viewDidLoad {
@@ -89,6 +90,7 @@
     [self cleanCache];
     
     [self.playerItem removeObserver:self forKeyPath:@"status"];
+    [self.player removeObserver:self forKeyPath:@"timeControlStatus"];
     
     [self.resourceLoaderManager cancelLoaders];
     
@@ -97,14 +99,15 @@
     self.playerItem = playerItem;
     
     [self.playerItem addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionNew context:nil];
+    [self.player addObserver:self forKeyPath:@"timeControlStatus" options:NSKeyValueObservingOptionNew context:nil];
     [self.player replaceCurrentItemWithPlayerItem:playerItem];
 }
 
 #pragma mark - Setup
 
 - (void)setupPlayer {
-        NSURL *url = [NSURL URLWithString:@"http://mpvideo-test.b0.upaiyun.com/5813998fb092e5771.mp4"];
-//        NSURL *url = [NSURL URLWithString:@"https://mvvideo5.meitudata.com/56a9e1389b9706520.mp4"];
+//        NSURL *url = [NSURL URLWithString:@"http://video.micous.com/你好.mp4"];
+        NSURL *url = [NSURL URLWithString:@"https://mvvideo5.meitudata.com/56ea0e90d6cb2653.mp4"];
 //        NSURL *url = [NSURL URLWithString:@"http://media-test.1iptv.com/recordings/z1.meipai-live-test.57d15a1f1013858cda04d060/z157d15a1f1013858cda04d060.m3u8?start=-1&end=-1"];
 //    NSURL *url = [NSURL URLWithString:@"http://nightwander.s.qupai.me/v/7f7aa378-b80e-44e8-a326-32b19614218f.mp4?token=AMIRnTPJEMn9iZslnQZp3bKNGNtBnSC10MYJDIyMDNyAyMkNGOwQmNkJGO3AjYwIDIyACNzIDMyczM4QTM"];
     //    NSURL *url = [NSURL URLWithString:@"http://data.5sing.kgimg.com/G061/M0A/03/13/HZQEAFb493iAOeg5AHMiAfzZU0E739.mp3"];
@@ -121,10 +124,11 @@
     }
 
     AVPlayer *player = [AVPlayer playerWithPlayerItem:playerItem];
-    player.automaticallyWaitsToMinimizeStalling = YES;
 //    AVPlayer *player = [AVPlayer playerWithURL:url];
+    player.automaticallyWaitsToMinimizeStalling = NO;
     self.player = player;
     [self.playerView setPlayer:player];
+    
     
     __weak typeof(self)weakSelf = self;
     self.timeObserver =
@@ -143,6 +147,7 @@
                                          }];
     
     [self.playerItem addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionNew context:nil];
+    [self.player addObserver:self forKeyPath:@"timeControlStatus" options:NSKeyValueObservingOptionNew context:nil];
     
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapPlayerViewAction:)];
     [self.playerView addGestureRecognizer:tap];
@@ -173,6 +178,8 @@
             // something went wrong. player.error should contain some information
             NSLog(@"player error %@", self.playerItem.error);
         }
+    } else if (object == self.player && [keyPath isEqualToString:@"timeControlStatus"]) {
+        NSLog(@"timeControlStatus: %@, reason: %@, rate: %@", @(self.player.timeControlStatus), self.player.reasonForWaitingToPlay, @(self.player.rate));
     }
 }
 
