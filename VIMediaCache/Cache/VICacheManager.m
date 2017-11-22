@@ -47,6 +47,7 @@ static NSTimeInterval kMCMediaCacheNotifyInterval;
 
 + (NSString *)cachedFilePathForURL:(NSURL *)url {
     NSString *pathComponent = [url.absoluteString vi_md5];
+    pathComponent = [pathComponent stringByAppendingPathExtension:url.pathExtension];
     return [[self cacheDirectory] stringByAppendingPathComponent:pathComponent];
 }
 
