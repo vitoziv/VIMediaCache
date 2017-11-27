@@ -112,7 +112,10 @@ static NSString *kCacheScheme = @"VIMediaCache";
     componnents.scheme = kCacheScheme;
     
     NSString *appendStr = componnents.query.length > 0 ? @"&" : @"?";
-    NSURL *assetURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@%@MCurl=%@", componnents.URL.absoluteString, appendStr, url.absoluteString]];
+    NSMutableCharacterSet *queryAllowedCharacterSet = [[NSCharacterSet URLQueryAllowedCharacterSet] mutableCopy];
+    [queryAllowedCharacterSet removeCharactersInString:@"&+=?"];
+    NSString *originURLStr = [url.absoluteString stringByAddingPercentEncodingWithAllowedCharacters:queryAllowedCharacterSet];
+    NSURL *assetURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@%@MCurl=%@", componnents.URL.absoluteString, appendStr, originURLStr]];
     
     return assetURL;
 }
