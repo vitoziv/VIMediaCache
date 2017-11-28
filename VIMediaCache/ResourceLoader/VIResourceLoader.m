@@ -62,11 +62,8 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
         }
     }];
     if (requestWorker) {
-        NSLog(@"requestWorker finished");
         [requestWorker finish];
         [self.pendingRequestWorkers removeObject:requestWorker];
-    } else {
-        NSLog(@"did not find");
     }
 }
 
@@ -77,14 +74,12 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
 #pragma mark - VIResourceLoadingRequestWorkerDelegate
 
 - (void)resourceLoadingRequestWorker:(VIResourceLoadingRequestWorker *)requestWorker didCompleteWithError:(NSError *)error {
-    NSLog(@"complete request, error: %@", error.localizedDescription);
     [self removeRequest:requestWorker.request];
     if (error && [self.delegate respondsToSelector:@selector(resourceLoader:didFailWithError:)]) {
         [self.delegate resourceLoader:self didFailWithError:error];
     }
 
     if (self.pendingRequestWorkers.count > 0) {
-        NSLog(@"left pendingRequestWorkers %@", self.pendingRequestWorkers);
         VIResourceLoadingRequestWorker *worker = [self.pendingRequestWorkers lastObject];
         [self.pendingRequestWorkers removeLastObject];
         [self startWorkerWithRequest:worker.request];
@@ -97,12 +92,8 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
     VIResourceLoadingRequestWorker *requestWorker = [[VIResourceLoadingRequestWorker alloc] initWithMediaDownloader:self.mediaDownloader
                                                                                              resourceLoadingRequest:request];
     [self.pendingRequestWorkers addObject:requestWorker];
-    [self startWorker:requestWorker];
-}
-
-- (void)startWorker:(VIResourceLoadingRequestWorker *)worker {
-    worker.delegate = self;
-    [worker startWork];
+    requestWorker.delegate = self;
+    [requestWorker startWork];
 }
 
 - (NSError *)loaderCancelledError{
