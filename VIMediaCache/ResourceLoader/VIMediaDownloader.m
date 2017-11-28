@@ -438,16 +438,16 @@ didCompleteWithError:(nullable NSError *)error {
 }
 
 - (void)cancel {
+    self.actionWorker.delegate = nil;
     [[VIMediaDownloaderStatus shared] removeURL:self.url];
     [self.actionWorker cancel];
-    self.actionWorker.delegate = nil;
     self.actionWorker = nil;
 }
 
 - (void)invalidateAndCancel {
+    self.actionWorker.delegate = nil;
     [[VIMediaDownloaderStatus shared] removeURL:self.url];
     [self.actionWorker cancel];
-    self.actionWorker.delegate = nil;
     self.actionWorker = nil;
 }
 

@@ -17,7 +17,7 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
 
 @property (nonatomic, strong, readwrite) NSURL *url;
 @property (nonatomic, strong) VIMediaDownloader *mediaDownloader;
-@property (nonatomic, strong) NSMutableDictionary *pendingRequestWorkers;
+@property (nonatomic, strong) NSMutableArray<VIResourceLoadingRequestWorker *> *pendingRequestWorkers;
 
 @property (nonatomic, getter=isCancelled) BOOL cancelled;
 
@@ -35,7 +35,7 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
     if (self) {
         _url = url;
         _mediaDownloader = [[VIMediaDownloader alloc] initWithURL:url];
-        _pendingRequestWorkers = [NSMutableDictionary dictionary];
+        _pendingRequestWorkers = [NSMutableArray array];
     }
     return self;
 }
@@ -46,21 +46,28 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
 }
 
 - (void)addRequest:(AVAssetResourceLoadingRequest *)request {
-    [self.pendingRequestWorkers enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, VIResourceLoadingRequestWorker * _Nonnull obj, BOOL * _Nonnull stop) {
+    [self.pendingRequestWorkers enumerateObjectsUsingBlock:^(VIResourceLoadingRequestWorker *  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         [obj cancel];
-        [obj finish];
     }];
-    [self.pendingRequestWorkers removeAllObjects];
     
     [self startWorkerWithRequest:request];
 }
 
 - (void)removeRequest:(AVAssetResourceLoadingRequest *)request {
-    NSString *key = [self keyForRequest:request];
-    VIResourceLoadingRequestWorker *requestWorker = self.pendingRequestWorkers[key];
-    [requestWorker finish];
-    
-    [self.pendingRequestWorkers removeObjectForKey:key];
+    __block VIResourceLoadingRequestWorker *requestWorker = nil;
+    [self.pendingRequestWorkers enumerateObjectsUsingBlock:^(VIResourceLoadingRequestWorker *  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if (obj.request == request) {
+            requestWorker = obj;
+            *stop = YES;
+        }
+    }];
+    if (requestWorker) {
+        NSLog(@"requestWorker finished");
+        [requestWorker finish];
+        [self.pendingRequestWorkers removeObject:requestWorker];
+    } else {
+        NSLog(@"did not find");
+    }
 }
 
 - (void)cancel {
@@ -70,25 +77,32 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
 #pragma mark - VIResourceLoadingRequestWorkerDelegate
 
 - (void)resourceLoadingRequestWorker:(VIResourceLoadingRequestWorker *)requestWorker didCompleteWithError:(NSError *)error {
+    NSLog(@"complete request, error: %@", error.localizedDescription);
     [self removeRequest:requestWorker.request];
     if (error && [self.delegate respondsToSelector:@selector(resourceLoader:didFailWithError:)]) {
         [self.delegate resourceLoader:self didFailWithError:error];
+    }
+
+    if (self.pendingRequestWorkers.count > 0) {
+        NSLog(@"left pendingRequestWorkers %@", self.pendingRequestWorkers);
+        VIResourceLoadingRequestWorker *worker = [self.pendingRequestWorkers lastObject];
+        [self.pendingRequestWorkers removeLastObject];
+        [self startWorkerWithRequest:worker.request];
     }
 }
 
 #pragma mark - Helper
 
 - (void)startWorkerWithRequest:(AVAssetResourceLoadingRequest *)request {
-    NSString *key = [self keyForRequest:request];
     VIResourceLoadingRequestWorker *requestWorker = [[VIResourceLoadingRequestWorker alloc] initWithMediaDownloader:self.mediaDownloader
                                                                                              resourceLoadingRequest:request];
-    requestWorker.delegate = self;
-    self.pendingRequestWorkers[key] = requestWorker;
-    [requestWorker startWork];
+    [self.pendingRequestWorkers addObject:requestWorker];
+    [self startWorker:requestWorker];
 }
 
-- (NSString *)keyForRequest:(AVAssetResourceLoadingRequest *)request {
-    return [NSString stringWithFormat:@"%@%@", request.request.URL.absoluteString, request.request.allHTTPHeaderFields[@"Range"]];
+- (void)startWorker:(VIResourceLoadingRequestWorker *)worker {
+    worker.delegate = self;
+    [worker startWork];
 }
 
 - (NSError *)loaderCancelledError{

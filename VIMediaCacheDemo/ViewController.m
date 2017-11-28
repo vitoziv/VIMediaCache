@@ -106,11 +106,9 @@
 #pragma mark - Setup
 
 - (void)setupPlayer {
-//        NSURL *url = [NSURL URLWithString:@"http://video.micous.com/你好.mp4"];
-        NSURL *url = [NSURL URLWithString:@"https://mvvideo5.meitudata.com/56ea0e90d6cb2653.mp4"];
-//        NSURL *url = [NSURL URLWithString:@"http://media-test.1iptv.com/recordings/z1.meipai-live-test.57d15a1f1013858cda04d060/z157d15a1f1013858cda04d060.m3u8?start=-1&end=-1"];
-//    NSURL *url = [NSURL URLWithString:@"http://nightwander.s.qupai.me/v/7f7aa378-b80e-44e8-a326-32b19614218f.mp4?token=AMIRnTPJEMn9iZslnQZp3bKNGNtBnSC10MYJDIyMDNyAyMkNGOwQmNkJGO3AjYwIDIyACNzIDMyczM4QTM"];
+//        NSURL *url = [NSURL URLWithString:@"https://mvvideo5.meitudata.com/56ea0e90d6cb2653.mp4"];
     //    NSURL *url = [NSURL URLWithString:@"http://data.5sing.kgimg.com/G061/M0A/03/13/HZQEAFb493iAOeg5AHMiAfzZU0E739.mp3"];
+    NSURL *url = [NSURL URLWithString:@"http://video.vcdn.xiaodaotv.com/C556CD50-B4E5-41C6-ACF1-3C77D86F9323?sign=6190bcda734a2d9a99a5f720ac34106b&t=5a1d818d"];
     
     VIResourceLoaderManager *resourceLoaderManager = [VIResourceLoaderManager new];
     self.resourceLoaderManager = resourceLoaderManager;
