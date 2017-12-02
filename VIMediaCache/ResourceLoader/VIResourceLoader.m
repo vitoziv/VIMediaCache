@@ -10,12 +10,14 @@
 #import "VIMediaDownloader.h"
 #import "VIResourceLoadingRequestWorker.h"
 #import "VIContentInfo.h"
+#import "VIMediaCacheWorker.h"
 
 NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderErrorDomain";
 
 @interface VIResourceLoader () <VIResourceLoadingRequestWorkerDelegate>
 
 @property (nonatomic, strong, readwrite) NSURL *url;
+@property (nonatomic, strong) VIMediaCacheWorker *cacheWorker;
 @property (nonatomic, strong) VIMediaDownloader *mediaDownloader;
 @property (nonatomic, strong) NSMutableArray<VIResourceLoadingRequestWorker *> *pendingRequestWorkers;
 
@@ -34,7 +36,8 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
     self = [super init];
     if (self) {
         _url = url;
-        _mediaDownloader = [[VIMediaDownloader alloc] initWithURL:url];
+        _cacheWorker = [[VIMediaCacheWorker alloc] initWithURL:url];
+        _mediaDownloader = [[VIMediaDownloader alloc] initWithURL:url cacheWorker:_cacheWorker];
         _pendingRequestWorkers = [NSMutableArray array];
     }
     return self;
@@ -47,10 +50,8 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
 
 - (void)addRequest:(AVAssetResourceLoadingRequest *)request {
     if (self.pendingRequestWorkers.count > 0) {
-        NSLog(@"====== start No cache");
         [self startNoCacheWorkerWithRequest:request];
     } else {
-        NSLog(@"====== start cache");
         [self startWorkerWithRequest:request];
     }
 }
@@ -71,6 +72,9 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
 
 - (void)cancel {
     [self.mediaDownloader cancel];
+    [self.pendingRequestWorkers removeAllObjects];
+    
+    [[VIMediaDownloaderStatus shared] removeURL:self.url];
 }
 
 #pragma mark - VIResourceLoadingRequestWorkerDelegate
@@ -80,20 +84,17 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
     if (error && [self.delegate respondsToSelector:@selector(resourceLoader:didFailWithError:)]) {
         [self.delegate resourceLoader:self didFailWithError:error];
     }
-
-    if (self.pendingRequestWorkers.count > 0) {
-        VIResourceLoadingRequestWorker *worker = [self.pendingRequestWorkers lastObject];
-        [self.pendingRequestWorkers removeLastObject];
-        [self startWorkerWithRequest:worker.request];
+    if (self.pendingRequestWorkers.count == 0) {
+        [[VIMediaDownloaderStatus shared] removeURL:self.url];
     }
 }
 
 #pragma mark - Helper
 
 - (void)startNoCacheWorkerWithRequest:(AVAssetResourceLoadingRequest *)request {
-    VIMediaDownloader *mediaDownloader = [[VIMediaDownloader alloc] initWithURL:self.url];
-    mediaDownloader.saveToCache = false;
-    VIResourceLoadingRequestWorker *requestWorker = [[VIResourceLoadingRequestWorker alloc] initWithMediaDownloader:self.mediaDownloader
+    [[VIMediaDownloaderStatus shared] addURL:self.url];
+    VIMediaDownloader *mediaDownloader = [[VIMediaDownloader alloc] initWithURL:self.url cacheWorker:self.cacheWorker];
+    VIResourceLoadingRequestWorker *requestWorker = [[VIResourceLoadingRequestWorker alloc] initWithMediaDownloader:mediaDownloader
                                                                                              resourceLoadingRequest:request];
     [self.pendingRequestWorkers addObject:requestWorker];
     requestWorker.delegate = self;
@@ -101,14 +102,16 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
 }
 
 - (void)startWorkerWithRequest:(AVAssetResourceLoadingRequest *)request {
+    [[VIMediaDownloaderStatus shared] addURL:self.url];
     VIResourceLoadingRequestWorker *requestWorker = [[VIResourceLoadingRequestWorker alloc] initWithMediaDownloader:self.mediaDownloader
                                                                                              resourceLoadingRequest:request];
     [self.pendingRequestWorkers addObject:requestWorker];
     requestWorker.delegate = self;
     [requestWorker startWork];
+    
 }
 
-- (NSError *)loaderCancelledError{
+- (NSError *)loaderCancelledError {
     NSError *error = [[NSError alloc] initWithDomain:MCResourceLoaderErrorDomain
                                                 code:-3
                                             userInfo:@{NSLocalizedDescriptionKey:@"Resource loader cancelled"}];

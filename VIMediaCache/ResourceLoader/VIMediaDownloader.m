@@ -388,13 +388,14 @@ didCompleteWithError:(nullable NSError *)error {
     [[VIMediaDownloaderStatus shared] removeURL:self.url];
 }
 
-- (instancetype)initWithURL:(NSURL *)url {
+- (instancetype)initWithURL:(NSURL *)url cacheWorker:(VIMediaCacheWorker *)cacheWorker {
     self = [super init];
     if (self) {
         _saveToCache = YES;
         _url = url;
-        _cacheWorker = [[VIMediaCacheWorker alloc] initWithURL:url];
+        _cacheWorker = cacheWorker;
         _info = _cacheWorker.cacheConfiguration.contentInfo;
+        [[VIMediaDownloaderStatus shared] addURL:self.url];
     }
     return self;
 }
@@ -402,12 +403,6 @@ didCompleteWithError:(nullable NSError *)error {
 - (void)downloadTaskFromOffset:(unsigned long long)fromOffset
                         length:(NSUInteger)length
                          toEnd:(BOOL)toEnd {
-    if ([self isCurrentURLDownloading]) {
-        [self handleCurrentURLDownloadingError];
-        return;
-    }
-    [[VIMediaDownloaderStatus shared] addURL:self.url];
-    
     // ---
     NSRange range = NSMakeRange((NSUInteger)fromOffset, length);
     
@@ -424,12 +419,6 @@ didCompleteWithError:(nullable NSError *)error {
 }
 
 - (void)downloadFromStartToEnd {
-    if ([self isCurrentURLDownloading]) {
-        [self handleCurrentURLDownloadingError];
-        return;
-    }
-    [[VIMediaDownloaderStatus shared] addURL:self.url];
-    
     // ---
     self.downloadToEnd = YES;
     NSRange range = NSMakeRange(0, 2);
@@ -446,20 +435,6 @@ didCompleteWithError:(nullable NSError *)error {
     [[VIMediaDownloaderStatus shared] removeURL:self.url];
     [self.actionWorker cancel];
     self.actionWorker = nil;
-}
-
-#pragma mark - Union check
-
-- (BOOL)isCurrentURLDownloading {
-    return [[VIMediaDownloaderStatus shared] containsURL:self.url];
-}
-
-- (void)handleCurrentURLDownloadingError {
-    if (self.delegate) {
-        NSString *description = [NSString stringWithFormat:NSLocalizedString(@"URL: `%@` alreay in downloading queue.", nil), self.url];
-        NSError *error = [NSError errorWithDomain:@"com.meidadownload" code:1 userInfo:@{NSLocalizedDescriptionKey: description}];
-        [self.delegate mediaDownloader:self didFinishedWithError:error];
-    }
 }
 
 #pragma mark - VIActionWorkerDelegate

@@ -70,7 +70,6 @@ static NSString *kCacheScheme = @"VIMediaCache";
 
 - (void)resourceLoader:(AVAssetResourceLoader *)resourceLoader didCancelLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest {
     VIResourceLoader *loader = [self loaderForRequest:loadingRequest];
-    [loader cancel];
     [loader removeRequest:loadingRequest];
 }
 

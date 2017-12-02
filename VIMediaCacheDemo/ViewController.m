@@ -124,7 +124,7 @@
 
     AVPlayer *player = [AVPlayer playerWithPlayerItem:playerItem];
 //    AVPlayer *player = [AVPlayer playerWithURL:url];
-//    player.automaticallyWaitsToMinimizeStalling = NO;
+    player.automaticallyWaitsToMinimizeStalling = NO;
     self.player = player;
     [self.playerView setPlayer:player];
     
