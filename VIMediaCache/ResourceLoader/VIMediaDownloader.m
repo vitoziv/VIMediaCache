@@ -107,6 +107,7 @@ didCompleteWithError:(nullable NSError *)error {
 @property (nonatomic, strong) NSMutableArray<VICacheAction *> *actions;
 - (instancetype)initWithActions:(NSArray<VICacheAction *> *)actions url:(NSURL *)url cacheWorker:(VIMediaCacheWorker *)cacheWorker;
 
+@property (nonatomic, assign) BOOL canSaveToCache;
 @property (nonatomic, weak) id<VIActionWorkerDelegate> delegate;
 
 - (void)start;
@@ -140,6 +141,7 @@ didCompleteWithError:(nullable NSError *)error {
 - (instancetype)initWithActions:(NSArray<VICacheAction *> *)actions url:(NSURL *)url cacheWorker:(VIMediaCacheWorker *)cacheWorker {
     self = [super init];
     if (self) {
+        _canSaveToCache = YES;
         _actions = [actions mutableCopy];
         _cacheWorker = cacheWorker;
         _url = url;
@@ -265,7 +267,9 @@ didReceiveResponse:(NSURLResponse *)response
         if ([self.delegate respondsToSelector:@selector(actionWorker:didReceiveResponse:)]) {
             [self.delegate actionWorker:self didReceiveResponse:response];
         }
-        [self.cacheWorker startWritting];
+        if (self.canSaveToCache) {
+            [self.cacheWorker startWritting];
+        }
         completionHandler(NSURLSessionResponseAllow);
     }
 }
@@ -276,16 +280,20 @@ didReceiveResponse:(NSURLResponse *)response
     if (self.isCancelled) {
         return;
     }
-    NSRange range = NSMakeRange(self.startOffset, data.length);
-    NSError *error;
-    [self.cacheWorker cacheData:data forRange:range error:&error];
-    if (error) {
-        if ([self.delegate respondsToSelector:@selector(actionWorker:didFinishWithError:)]) {
-            [self.delegate actionWorker:self didFinishWithError:error];
+    
+    if (self.canSaveToCache) {
+        NSRange range = NSMakeRange(self.startOffset, data.length);
+        NSError *error;
+        [self.cacheWorker cacheData:data forRange:range error:&error];
+        if (error) {
+            if ([self.delegate respondsToSelector:@selector(actionWorker:didFinishWithError:)]) {
+                [self.delegate actionWorker:self didFinishWithError:error];
+            }
+            return;
         }
-        return;
+        [self.cacheWorker save];
     }
-    [self.cacheWorker save];
+    
     self.startOffset += data.length;
     if ([self.delegate respondsToSelector:@selector(actionWorker:didReceiveData:isLocal:)]) {
         [self.delegate actionWorker:self didReceiveData:data isLocal:NO];
@@ -297,8 +305,10 @@ didReceiveResponse:(NSURLResponse *)response
 - (void)URLSession:(NSURLSession *)session
               task:(NSURLSessionTask *)task
 didCompleteWithError:(nullable NSError *)error {
-    [self.cacheWorker finishWritting];
-    [self.cacheWorker save];
+    if (self.canSaveToCache) {
+        [self.cacheWorker finishWritting];
+        [self.cacheWorker save];
+    }
     if (error) {
         if ([self.delegate respondsToSelector:@selector(actionWorker:didFinishWithError:)]) {
             [self.delegate actionWorker:self didFinishWithError:error];
@@ -363,7 +373,6 @@ didCompleteWithError:(nullable NSError *)error {
 @interface VIMediaDownloader () <VIActionWorkerDelegate>
 
 @property (nonatomic, strong) NSURL *url;
-@property (nonatomic, strong) NSURLSession *session;
 @property (nonatomic, strong) NSURLSessionDataTask *task;
 
 @property (nonatomic, strong) VIMediaCacheWorker *cacheWorker;
@@ -382,19 +391,12 @@ didCompleteWithError:(nullable NSError *)error {
 - (instancetype)initWithURL:(NSURL *)url {
     self = [super init];
     if (self) {
+        _saveToCache = YES;
         _url = url;
         _cacheWorker = [[VIMediaCacheWorker alloc] initWithURL:url];
         _info = _cacheWorker.cacheConfiguration.contentInfo;
     }
     return self;
-}
-
-- (NSURLSession *)session {
-    if (!_session) {
-        NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
-        _session = [NSURLSession sessionWithConfiguration:configuration];
-    }
-    return _session;
 }
 
 - (void)downloadTaskFromOffset:(unsigned long long)fromOffset
@@ -416,6 +418,7 @@ didCompleteWithError:(nullable NSError *)error {
     NSArray *actions = [self.cacheWorker cachedDataActionsForRange:range];
 
     self.actionWorker = [[VIActionWorker alloc] initWithActions:actions url:self.url cacheWorker:self.cacheWorker];
+    self.actionWorker.canSaveToCache = self.saveToCache;
     self.actionWorker.delegate = self;
     [self.actionWorker start];
 }
@@ -433,18 +436,12 @@ didCompleteWithError:(nullable NSError *)error {
     NSArray *actions = [self.cacheWorker cachedDataActionsForRange:range];
 
     self.actionWorker = [[VIActionWorker alloc] initWithActions:actions url:self.url cacheWorker:self.cacheWorker];
+    self.actionWorker.canSaveToCache = self.saveToCache;
     self.actionWorker.delegate = self;
     [self.actionWorker start];
 }
 
 - (void)cancel {
-    self.actionWorker.delegate = nil;
-    [[VIMediaDownloaderStatus shared] removeURL:self.url];
-    [self.actionWorker cancel];
-    self.actionWorker = nil;
-}
-
-- (void)invalidateAndCancel {
     self.actionWorker.delegate = nil;
     [[VIMediaDownloaderStatus shared] removeURL:self.url];
     [self.actionWorker cancel];

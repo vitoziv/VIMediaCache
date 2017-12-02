@@ -29,6 +29,7 @@
 @property (nonatomic, strong, readonly) NSURL *url;
 @property (nonatomic, weak) id<VIMediaDownloaderDelegate> delegate;
 @property (nonatomic, strong) VIContentInfo *info;
+@property (nonatomic, assign) BOOL saveToCache;
 
 - (void)downloadTaskFromOffset:(unsigned long long)fromOffset
                         length:(NSUInteger)length
@@ -36,7 +37,6 @@
 - (void)downloadFromStartToEnd;
 
 - (void)cancel;
-- (void)invalidateAndCancel;
 
 @end
 

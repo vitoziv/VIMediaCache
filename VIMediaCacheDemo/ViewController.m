@@ -108,7 +108,8 @@
 - (void)setupPlayer {
 //        NSURL *url = [NSURL URLWithString:@"https://mvvideo5.meitudata.com/56ea0e90d6cb2653.mp4"];
     //    NSURL *url = [NSURL URLWithString:@"http://data.5sing.kgimg.com/G061/M0A/03/13/HZQEAFb493iAOeg5AHMiAfzZU0E739.mp3"];
-    NSURL *url = [NSURL URLWithString:@"http://video.vcdn.xiaodaotv.com/C556CD50-B4E5-41C6-ACF1-3C77D86F9323?sign=6190bcda734a2d9a99a5f720ac34106b&t=5a1d818d"];
+    NSURL *url = [NSURL URLWithString:@"http://tu-img-1.aixinxi.net/o_1bvbvir4l16t186hv147dphd7a.mp4"];
+//    NSURL *url = [NSURL URLWithString:@"http://video.vcdn.xiaodaotv.com/C556CD50-B4E5-41C6-ACF1-3C77D86F9323?sign=6190bcda734a2d9a99a5f720ac34106b&t=5a1d818d"];
     
     VIResourceLoaderManager *resourceLoaderManager = [VIResourceLoaderManager new];
     self.resourceLoaderManager = resourceLoaderManager;
@@ -123,7 +124,7 @@
 
     AVPlayer *player = [AVPlayer playerWithPlayerItem:playerItem];
 //    AVPlayer *player = [AVPlayer playerWithURL:url];
-    player.automaticallyWaitsToMinimizeStalling = NO;
+//    player.automaticallyWaitsToMinimizeStalling = NO;
     self.player = player;
     [self.playerView setPlayer:player];
     

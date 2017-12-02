@@ -27,7 +27,7 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
 
 
 - (void)dealloc {
-    [_mediaDownloader invalidateAndCancel];
+    [_mediaDownloader cancel];
 }
 
 - (instancetype)initWithURL:(NSURL *)url {
@@ -46,11 +46,13 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
 }
 
 - (void)addRequest:(AVAssetResourceLoadingRequest *)request {
-    [self.pendingRequestWorkers enumerateObjectsUsingBlock:^(VIResourceLoadingRequestWorker *  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        [obj cancel];
-    }];
-    
-    [self startWorkerWithRequest:request];
+    if (self.pendingRequestWorkers.count > 0) {
+        NSLog(@"====== start No cache");
+        [self startNoCacheWorkerWithRequest:request];
+    } else {
+        NSLog(@"====== start cache");
+        [self startWorkerWithRequest:request];
+    }
 }
 
 - (void)removeRequest:(AVAssetResourceLoadingRequest *)request {
@@ -87,6 +89,16 @@ NSString * const MCResourceLoaderErrorDomain = @"LSFilePlayerResourceLoaderError
 }
 
 #pragma mark - Helper
+
+- (void)startNoCacheWorkerWithRequest:(AVAssetResourceLoadingRequest *)request {
+    VIMediaDownloader *mediaDownloader = [[VIMediaDownloader alloc] initWithURL:self.url];
+    mediaDownloader.saveToCache = false;
+    VIResourceLoadingRequestWorker *requestWorker = [[VIResourceLoadingRequestWorker alloc] initWithMediaDownloader:self.mediaDownloader
+                                                                                             resourceLoadingRequest:request];
+    [self.pendingRequestWorkers addObject:requestWorker];
+    requestWorker.delegate = self;
+    [requestWorker startWork];
+}
 
 - (void)startWorkerWithRequest:(AVAssetResourceLoadingRequest *)request {
     VIResourceLoadingRequestWorker *requestWorker = [[VIResourceLoadingRequestWorker alloc] initWithMediaDownloader:self.mediaDownloader
