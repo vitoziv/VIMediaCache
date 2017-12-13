@@ -108,7 +108,9 @@ static NSTimeInterval kMCMediaCacheNotifyInterval;
 + (void)cleanCacheForURL:(NSURL *)url error:(NSError **)error {
     if ([[VIMediaDownloaderStatus shared] containsURL:url]) {
         NSString *description = [NSString stringWithFormat:NSLocalizedString(@"Clean cache for url `%@` can't be done, because it's downloading", nil), url];
-        *error = [NSError errorWithDomain:@"com.mediadownload" code:2 userInfo:@{NSLocalizedDescriptionKey: description}];
+        if (error) {
+            *error = [NSError errorWithDomain:@"com.mediadownload" code:2 userInfo:@{NSLocalizedDescriptionKey: description}];
+        }
         return;
     }
     
