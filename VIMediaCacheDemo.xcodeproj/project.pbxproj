@@ -20,6 +20,7 @@
 		5F5FA61E1CEA2BE2004439D3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5F5FA61C1CEA2BE2004439D3 /* LaunchScreen.storyboard */; };
 		5F5FA6291CEA2BE2004439D3 /* VIMediaCacheDemoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5F5FA6281CEA2BE2004439D3 /* VIMediaCacheDemoTests.m */; };
 		5F5FA67F1CEA2D95004439D3 /* PlayerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5F5FA67E1CEA2D95004439D3 /* PlayerView.m */; };
+		5FC756B41FC47A4C00608495 /* NSString+VIMD5.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FC756B31FC47A4C00608495 /* NSString+VIMD5.m */; };
 		5FDCF2AE1CEBF26800188E0C /* VIContentInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FDCF2971CEBF26800188E0C /* VIContentInfo.m */; };
 		5FDCF2AF1CEBF26800188E0C /* VIMediaDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FDCF2991CEBF26800188E0C /* VIMediaDownloader.m */; };
 		5FDCF2B01CEBF26800188E0C /* VIResourceLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FDCF29B1CEBF26800188E0C /* VIResourceLoader.m */; };
@@ -65,6 +66,8 @@
 		5F5FA62A1CEA2BE2004439D3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5F5FA67D1CEA2D95004439D3 /* PlayerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlayerView.h; sourceTree = "<group>"; };
 		5F5FA67E1CEA2D95004439D3 /* PlayerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlayerView.m; sourceTree = "<group>"; };
+		5FC756B21FC47A4C00608495 /* NSString+VIMD5.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+VIMD5.h"; sourceTree = "<group>"; };
+		5FC756B31FC47A4C00608495 /* NSString+VIMD5.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+VIMD5.m"; sourceTree = "<group>"; };
 		5FDCF2961CEBF26800188E0C /* VIContentInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VIContentInfo.h; sourceTree = "<group>"; };
 		5FDCF2971CEBF26800188E0C /* VIContentInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VIContentInfo.m; sourceTree = "<group>"; };
 		5FDCF2981CEBF26800188E0C /* VIMediaDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VIMediaDownloader.h; sourceTree = "<group>"; };
@@ -113,6 +116,8 @@
 				5F2836BA1D96548E000910CA /* VICacheSessionManager.m */,
 				5F2836BB1D96548E000910CA /* VIMediaCacheWorker.h */,
 				5F2836BC1D96548E000910CA /* VIMediaCacheWorker.m */,
+				5FC756B21FC47A4C00608495 /* NSString+VIMD5.h */,
+				5FC756B31FC47A4C00608495 /* NSString+VIMD5.m */,
 			);
 			path = Cache;
 			sourceTree = "<group>";
@@ -312,6 +317,7 @@
 				5FDCF2B11CEBF26800188E0C /* VIResourceLoaderManager.m in Sources */,
 				5F2836C01D96548E000910CA /* VICacheSessionManager.m in Sources */,
 				5F5FA6101CEA2BE2004439D3 /* main.m in Sources */,
+				5FC756B41FC47A4C00608495 /* NSString+VIMD5.m in Sources */,
 				5F2836BD1D96548E000910CA /* VICacheAction.m in Sources */,
 				5F2836BF1D96548E000910CA /* VICacheManager.m in Sources */,
 				5FDCF2AE1CEBF26800188E0C /* VIContentInfo.m in Sources */,

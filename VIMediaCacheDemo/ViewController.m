@@ -34,6 +34,7 @@
     [self.player removeTimeObserver:self.timeObserver];
     self.timeObserver = nil;
     [self.playerItem removeObserver:self forKeyPath:@"status"];
+    [self.player removeObserver:self forKeyPath:@"timeControlStatus"];
 }
 
 - (void)viewDidLoad {
@@ -89,6 +90,7 @@
     [self cleanCache];
     
     [self.playerItem removeObserver:self forKeyPath:@"status"];
+    [self.player removeObserver:self forKeyPath:@"timeControlStatus"];
     
     [self.resourceLoaderManager cancelLoaders];
     
@@ -97,17 +99,23 @@
     self.playerItem = playerItem;
     
     [self.playerItem addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionNew context:nil];
+    [self.player addObserver:self forKeyPath:@"timeControlStatus" options:NSKeyValueObservingOptionNew context:nil];
     [self.player replaceCurrentItemWithPlayerItem:playerItem];
 }
 
 #pragma mark - Setup
 
 - (void)setupPlayer {
+
         NSURL *url = [NSURL URLWithString:@"http://gedftnj8mkvfefuaefm.exp.bcevod.com/mda-hc2s2difdjz6c5y9/hd/mda-hc2s2difdjz6c5y9.mp4?playlist%3D%5B%22hd%22%5D&auth_key=1500559192-0-0-dcb501bf19beb0bd4e0f7ad30c380763&bcevod_channel=searchbox_feed&srchid=3ed366b1b0bf70e0&channel_id=2&d_t=2&b_v=9.1.0.0"];
 //        NSURL *url = [NSURL URLWithString:@"https://mvvideo5.meitudata.com/56a9e1389b9706520.mp4"];
 //        NSURL *url = [NSURL URLWithString:@"http://media-test.1iptv.com/recordings/z1.meipai-live-test.57d15a1f1013858cda04d060/z157d15a1f1013858cda04d060.m3u8?start=-1&end=-1"];
 //    NSURL *url = [NSURL URLWithString:@"http://nightwander.s.qupai.me/v/7f7aa378-b80e-44e8-a326-32b19614218f.mp4?token=AMIRnTPJEMn9iZslnQZp3bKNGNtBnSC10MYJDIyMDNyAyMkNGOwQmNkJGO3AjYwIDIyACNzIDMyczM4QTM"];
+//        NSURL *url = [NSURL URLWithString:@"https://mvvideo5.meitudata.com/56ea0e90d6cb2653.mp4"];
+
     //    NSURL *url = [NSURL URLWithString:@"http://data.5sing.kgimg.com/G061/M0A/03/13/HZQEAFb493iAOeg5AHMiAfzZU0E739.mp3"];
+    // NSURL *url = [NSURL URLWithString:@"http://tu-img-1.aixinxi.net/o_1bvbvir4l16t186hv147dphd7a.mp4"];
+//    NSURL *url = [NSURL URLWithString:@"http://video.vcdn.xiaodaotv.com/C556CD50-B4E5-41C6-ACF1-3C77D86F9323?sign=6190bcda734a2d9a99a5f720ac34106b&t=5a1d818d"];
     
     VIResourceLoaderManager *resourceLoaderManager = [VIResourceLoaderManager new];
     self.resourceLoaderManager = resourceLoaderManager;
@@ -121,10 +129,11 @@
     }
 
     AVPlayer *player = [AVPlayer playerWithPlayerItem:playerItem];
-    player.automaticallyWaitsToMinimizeStalling = YES;
 //    AVPlayer *player = [AVPlayer playerWithURL:url];
+    player.automaticallyWaitsToMinimizeStalling = NO;
     self.player = player;
     [self.playerView setPlayer:player];
+    
     
     __weak typeof(self)weakSelf = self;
     self.timeObserver =
@@ -143,6 +152,7 @@
                                          }];
     
     [self.playerItem addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionNew context:nil];
+    [self.player addObserver:self forKeyPath:@"timeControlStatus" options:NSKeyValueObservingOptionNew context:nil];
     
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapPlayerViewAction:)];
     [self.playerView addGestureRecognizer:tap];
@@ -173,6 +183,8 @@
             // something went wrong. player.error should contain some information
             NSLog(@"player error %@", self.playerItem.error);
         }
+    } else if (object == self.player && [keyPath isEqualToString:@"timeControlStatus"]) {
+        NSLog(@"timeControlStatus: %@, reason: %@, rate: %@", @(self.player.timeControlStatus), self.player.reasonForWaitingToPlay, @(self.player.rate));
     }
 }
 
