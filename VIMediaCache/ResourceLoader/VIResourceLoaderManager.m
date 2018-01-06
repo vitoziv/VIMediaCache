@@ -45,20 +45,7 @@ static NSString *kCacheScheme = @"__VIMediaCache___:";
     if ([resourceURL.absoluteString hasPrefix:kCacheScheme]) {
         VIResourceLoader *loader = [self loaderForRequest:loadingRequest];
         if (!loader) {
-            /*
-            NSURLComponents *components = [NSURLComponents componentsWithString:resourceURL.absoluteString];
-            NSURL *originURL;
-            if ([components respondsToSelector:@selector(queryItems)]) {
-                NSURLQueryItem *queryItem = [components.queryItems lastObject];
-                NSString *urlString = [queryItem.value stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-                originURL = [NSURL URLWithString:urlString];
-            } else {
-                NSString *url = [[components.query componentsSeparatedByString:@"="] lastObject];
-                url = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-                originURL = [NSURL URLWithString:url];
-            }
-             */
-             NSURL *originURL = nil;
+            NSURL *originURL = nil;
             NSString *originStr = [resourceURL absoluteString];
             originStr = [originStr stringByReplacingOccurrencesOfString:kCacheScheme withString:@""];
             originURL = [NSURL URLWithString:originStr];
@@ -114,8 +101,6 @@ static NSString *kCacheScheme = @"__VIMediaCache___:";
     }
 
     NSURL *assetURL = [NSURL URLWithString:[kCacheScheme stringByAppendingString:[url absoluteString]]];
-
-    
     return assetURL;
 }
 
