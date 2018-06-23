@@ -25,10 +25,10 @@ AVPlayer *player = [AVPlayer playerWithPlayerItem:playerItem];
 **Swift**
 
 ```Swift
-var url = URL(string: "https://mvvideo5.meitudata.com/571090934cea5517.mp4")
-var resourceLoaderManager = VIResourceLoaderManager()
-var playerItem = resourceLoaderManager.playerItem(with: url)
-var player = AVPlayer(playerItem: playerItem)
+let url = URL(string: "https://mvvideo5.meitudata.com/571090934cea5517.mp4")
+let resourceLoaderManager = VIResourceLoaderManager()
+let playerItem = resourceLoaderManager.playerItem(with: url)
+let player = AVPlayer(playerItem: playerItem)
 ```
 
 ### Contact
