@@ -12,13 +12,24 @@ VIMediaCache use AVAssetResourceLoader to control AVPlayer download media data.
 
 ### Usage
 
-    NSURL *url = [NSURL URLWithString:@"https://mvvideo5.meitudata.com/571090934cea5517.mp4"];
-    
-    VIResourceLoaderManager *resourceLoaderManager = [VIResourceLoaderManager new];
-    self.resourceLoaderManager = resourceLoaderManager;
-    
-    AVPlayerItem *playerItem = [resourceLoaderManager playerItemWithURL:url];
-    AVPlayer *player = [AVPlayer playerWithPlayerItem:playerItem];
+**Objective C**
+
+```Objc
+NSURL *url = [NSURL URLWithString:@"https://mvvideo5.meitudata.com/571090934cea5517.mp4"];
+VIResourceLoaderManager *resourceLoaderManager = [VIResourceLoaderManager new];
+self.resourceLoaderManager = resourceLoaderManager;
+AVPlayerItem *playerItem = [resourceLoaderManager playerItemWithURL:url];
+AVPlayer *player = [AVPlayer playerWithPlayerItem:playerItem];
+```
+
+**Swift**
+
+```Swift
+var url = URL(string: "https://mvvideo5.meitudata.com/571090934cea5517.mp4")
+var resourceLoaderManager = VIResourceLoaderManager()
+var playerItem = resourceLoaderManager.playerItem(with: url)
+var player = AVPlayer(playerItem: playerItem)
+```
 
 ### Contact
 
