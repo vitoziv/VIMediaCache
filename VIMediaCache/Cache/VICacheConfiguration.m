@@ -131,6 +131,11 @@ static NSString *kURLKey = @"kURLKey";
 #pragma mark - Update
 
 - (void)save {
+    [[self class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(archiveData) object:nil];
+    [self performSelector:@selector(archiveData) withObject:nil afterDelay:1.0];
+}
+
+- (void)archiveData {
     @synchronized (self.internalCacheFragments) {
         [NSKeyedArchiver archiveRootObject:self toFile:self.filePath];
     }

@@ -7,7 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
-@import AVFoundation;
+#import <AVFoundation/AVFoundation.h>
+
 @protocol VIResourceLoaderManagerDelegate;
 
 @interface VIResourceLoaderManager : NSObject <AVAssetResourceLoaderDelegate>
