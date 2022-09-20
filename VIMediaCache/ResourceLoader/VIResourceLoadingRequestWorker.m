@@ -59,6 +59,7 @@
 
 - (void)finish {
     if (!self.request.isFinished) {
+        [self.mediaDownloader cancel];
         [self.request finishLoadingWithError:[self loaderCancelledError]];
     }
 }
