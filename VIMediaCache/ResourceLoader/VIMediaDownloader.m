@@ -182,14 +182,10 @@ didCompleteWithError:(nullable NSError *)error {
         return;
     }
     
-    VICacheAction *action = [self.actions firstObject];
+    VICacheAction *action = [self popFirstActionInList];
     if (!action) {
-        if ([self.delegate respondsToSelector:@selector(actionWorker:didFinishWithError:)]) {
-            [self.delegate actionWorker:self didFinishWithError:nil];
-        }
         return;
     }
-    [self.actions removeObjectAtIndex:0];
     
     if (action.actionType == VICacheAtionTypeLocal) {
         NSError *error;
@@ -202,7 +198,7 @@ didCompleteWithError:(nullable NSError *)error {
             if ([self.delegate respondsToSelector:@selector(actionWorker:didReceiveData:isLocal:)]) {
                 [self.delegate actionWorker:self didReceiveData:data isLocal:YES];
             }
-            [self processActions];
+            [self processActionsLater];
         }
     } else {
         long long fromOffset = action.range.location;
@@ -216,6 +212,31 @@ didCompleteWithError:(nullable NSError *)error {
         [self.task resume];
     }
 }
+
+// process data recursively,
+- (void)processActionsLater {
+    __weak typeof(self) weakSelf = self;
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        __strong typeof(self) self = weakSelf;
+        [self processActions];
+    });
+}
+
+- (VICacheAction *)popFirstActionInList {
+    @synchronized (self) {
+        VICacheAction *action = [self.actions firstObject];
+        if (action) {
+            [self.actions removeObjectAtIndex:0];
+            return action;
+        }
+    }
+    if ([self.delegate respondsToSelector:@selector(actionWorker:didFinishWithError:)]) {
+        [self.delegate actionWorker:self didFinishWithError:nil];
+    }
+    return nil;
+}
+
+#pragma mark - Notify
 
 - (void)notifyDownloadProgressWithFlush:(BOOL)flush finished:(BOOL)finished {
     double currentTime = CFAbsoluteTimeGetCurrent();
