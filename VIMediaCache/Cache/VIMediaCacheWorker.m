@@ -12,7 +12,7 @@
 
 @import UIKit;
 
-static NSInteger const kPackageLength = 204800; // 200kb per package
+static NSInteger const kPackageLength = 512 * 1024; // 512 kb per package
 static NSString *kMCMediaCacheResponseKey = @"kMCMediaCacheResponseKey";
 static NSString *VIMediaCacheErrorDoamin = @"com.vimediacache";
 
