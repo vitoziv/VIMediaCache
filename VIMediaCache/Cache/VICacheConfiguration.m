@@ -131,6 +131,21 @@ static NSString *kURLKey = @"kURLKey";
 #pragma mark - Update
 
 - (void)save {
+    if ([NSThread isMainThread]) {
+        // Called in main thread when VIMediaCacheWorker dealloc
+        [self doDelaySaveAction];
+    } else {
+        // Called in NSOperation which is dipatched by NSOperationQueue ("com.vimediacache.download")
+        // After 1.0 second delay, the NSOperation will destory and the selector will never execute.
+        // So dispatch in main queue.
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self doDelaySaveAction];
+        });
+    }
+}
+
+- (void)doDelaySaveAction
+{
     [[self class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(archiveData) object:nil];
     [self performSelector:@selector(archiveData) withObject:nil afterDelay:1.0];
 }
