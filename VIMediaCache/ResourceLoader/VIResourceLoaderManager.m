@@ -9,7 +9,7 @@
 #import "VIResourceLoaderManager.h"
 #import "VIResourceLoader.h"
 
-static NSString *kCacheScheme = @"__VIMediaCache___:";
+static NSString *kCacheScheme = @"VIMediaCache:";
 
 @interface VIResourceLoaderManager () <VIResourceLoaderDelegate>
 
